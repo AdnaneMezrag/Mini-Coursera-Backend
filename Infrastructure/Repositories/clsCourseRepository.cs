@@ -34,6 +34,14 @@ namespace Infrastructure.Repositories
                 .Take(amount)                 // Limit the number
                 .ToListAsync();
         }
+        public async Task<List<clsCourse>> GetSearchedCoursesAsync(string searchTerm,int amount)
+        {
+            List<clsCourse> Courses = await _miniCourseraContext.Courses
+                .Where(course => course.Title.Contains(searchTerm) || course.Description.Contains(searchTerm))
+                .Take(amount)                 // Limit the number
+                .ToListAsync();
+            return Courses;
+        }
 
         public Task<clsCourse?> GetByIdAsync(int id)
         {

@@ -12,6 +12,7 @@ namespace Domain.Interfaces
         public Task<List<clsCourse>> GetNewCoursesAsync(int amount = 4);
         public Task<List<clsCourse>> GetPopularCoursesAsync(int amount = 4);
         public Task<List<clsCourse>> GetDiscoverCoursesAsync(int amount = 4);
+        public Task<List<clsCourse>> GetSearchedCoursesAsync(string searchTerm, int amount = 4);
 
     }
 }

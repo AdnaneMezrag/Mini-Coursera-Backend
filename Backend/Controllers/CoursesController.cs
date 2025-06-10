@@ -70,7 +70,7 @@ namespace API.Controllers
 
 
 
-        [HttpGet("Discover")]
+        [HttpGet("discover")]
         [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -80,6 +80,37 @@ namespace API.Controllers
             try
             {
                 var courses = await _courseService.GetDiscoverCoursesAsync(limit);
+                if (!courses.Any())
+                {
+                    return NotFound("No courses available");
+                }
+
+                var courseDtos = _mapper.Map<List<CourseReadDTO>>(courses);
+                return Ok(courseDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
+
+
+
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<List<CourseReadDTO>>> GetSearchedCourses(
+ string searchTerm, int limit = 12)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                return BadRequest("Search term cannot be empty");
+            }
+            try
+            {
+                var courses = await _courseService.GetSearchedCoursesAsync(searchTerm,limit);
                 if (!courses.Any())
                 {
                     return NotFound("No courses available");

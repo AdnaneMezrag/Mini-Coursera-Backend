@@ -29,7 +29,10 @@ namespace Application
         {
             return await _courseRepository.GetDiscoverCoursesAsync(amount);
         }
-
+        public async Task<List<clsCourse>> GetSearchedCoursesAsync(string searchTerm, int amount)
+        {
+            return await _courseRepository.GetSearchedCoursesAsync(searchTerm, amount);
+        }
         public async Task CreateCourseAsync(CourseCreateDTO courseCreateDTO, Stream imageStream)
         {
             var imageUrl = await _imageStorage.SaveImageAsync(imageStream);
