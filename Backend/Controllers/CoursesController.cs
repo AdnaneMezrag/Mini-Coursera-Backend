@@ -18,23 +18,88 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetCourses()
+        [HttpGet("new")]
+        [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<CourseReadDTO>>> GetNewCourses(
+            [FromQuery] int limit = 4)
         {
-            var courses = await _courseService.GetNewCoursesAsync();
-            // Map entities to DTOs
-            var courseDtos = _mapper.Map<List<CourseReadDTO>>(courses);
+            try
+            {
+                var courses = await _courseService.GetNewCoursesAsync(limit);
+                if (!courses.Any())
+                {
+                    return NotFound("No courses available");
+                }
 
-            return Ok(courseDtos);
+                var courseDtos = _mapper.Map<List<CourseReadDTO>>(courses);
+                return Ok(courseDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
         }
 
 
-        // In the Controller (Presentation Layer)
+
+        [HttpGet("popular")]
+        [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<CourseReadDTO>>> GetPopularCourses(
+    [FromQuery] int limit = 4)
+        {
+            try
+            {
+                var courses = await _courseService.GetPopularCoursesAsync(limit);
+                if (!courses.Any())
+                {
+                    return NotFound("No courses available");
+                }
+
+                var courseDtos = _mapper.Map<List<CourseReadDTO>>(courses);
+                return Ok(courseDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
+
+
+
+        [HttpGet("Discover")]
+        [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<CourseReadDTO>>> GetDiscoverCourses(
+[FromQuery] int limit = 4)
+        {
+            try
+            {
+                var courses = await _courseService.GetDiscoverCoursesAsync(limit);
+                if (!courses.Any())
+                {
+                    return NotFound("No courses available");
+                }
+
+                var courseDtos = _mapper.Map<List<CourseReadDTO>>(courses);
+                return Ok(courseDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CourseCreateDTO request, IFormFile Image)
         {
-            if (Image == null || Image.Length == 0)
-                return BadRequest("Image is required.");
+            if (Image == null || Image.Length == 0 || request.InstructorID <= 0 || request.Price < 0)
+                return BadRequest("Verify the data you have entered");
 
             using var stream = Image.OpenReadStream();
             await _courseService.CreateCourseAsync(request,stream);

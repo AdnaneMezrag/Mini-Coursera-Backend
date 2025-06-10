@@ -16,6 +16,22 @@ namespace Infrastructure.Repositories
             return await _miniCourseraContext.Courses
                 .OrderByDescending(course => course.CreatedAt)
                 .Take(amount)
+                .Include(course => course.Instructor)
+                .ToListAsync();
+        }
+        public async Task<List<clsCourse>> GetPopularCoursesAsync(int amount = 4)
+        {
+            return await _miniCourseraContext.Courses
+                .OrderByDescending(course => course.EnrollmentsCount)
+                .Take(amount)
+                .Include(course => course.Instructor)
+                .ToListAsync();
+        }
+        public async Task<List<clsCourse>> GetDiscoverCoursesAsync(int amount = 4)
+        {
+            return await _miniCourseraContext.Courses
+                .OrderBy(c => Guid.NewGuid()) // Randomize
+                .Take(amount)                 // Limit the number
                 .ToListAsync();
         }
 

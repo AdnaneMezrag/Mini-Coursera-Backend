@@ -10,5 +10,8 @@ namespace Domain.Interfaces
     public interface ICourseRepository : IBaseRepository<clsCourse>
     {
         public Task<List<clsCourse>> GetNewCoursesAsync(int amount = 4);
+        public Task<List<clsCourse>> GetPopularCoursesAsync(int amount = 4);
+        public Task<List<clsCourse>> GetDiscoverCoursesAsync(int amount = 4);
+
     }
 }

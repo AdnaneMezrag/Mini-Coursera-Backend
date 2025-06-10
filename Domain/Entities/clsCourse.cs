@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace Domain.Entities
         public int InstructorID { get; set; } = default!;
         public clsInstructor Instructor { get; set; } = default!;
         public List<clsStudent> Students { get; set; } = new List<clsStudent>();
-
+        public int EnrollmentsCount { get; set; }
         public clsCourse()
         {
             // Default constructor for EF Core

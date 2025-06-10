@@ -16,5 +16,7 @@ namespace Domain.Entities
         public string Password { get; set; } = default!;
         public DateTime DateOfBirth { get; set; }
         public string PhotoUrl { get; set; } = default!;
+        public string FullName => $"{FirstName} {LastName}".Trim();
+
     }
 }
