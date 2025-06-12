@@ -100,14 +100,9 @@ namespace API.Controllers
         [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<List<CourseReadDTO>>> GetSearchedCourses(
- string searchTerm, int limit = 12)
+ string? searchTerm="", int limit = 12)
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-            {
-                return BadRequest("Search term cannot be empty");
-            }
             try
             {
                 var courses = await _courseService.GetSearchedCoursesAsync(searchTerm,limit);
