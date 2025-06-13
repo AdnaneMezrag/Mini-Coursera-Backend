@@ -8,6 +8,7 @@ using Infrastructure;
 using Infrastructure.Repositories;
 using Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
 namespace Backend
@@ -24,9 +25,11 @@ namespace Backend
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<MiniCourseraContext>(options =>
-                options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString)
+           .EnableSensitiveDataLogging()); // Optional: shows parameters
+
             builder.Services.AddScoped<clsCourseService>();
-            builder.Services.AddScoped<ICourseRepository, clsCourseRepository>();
+            builder.Services.AddScoped<ICourseRepository, CourseRepository>();
             builder.Services.AddScoped<clsCourseService>();
             builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
 
@@ -43,6 +46,7 @@ namespace Backend
 
                 return config.CreateMapper();
             });
+
 
             // No named CORS policy needed
             var app = builder.Build();

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class clsUser
+    public class User
     {
         public int Id { get; set; }
         public string FirstName { get; set; } = default!;

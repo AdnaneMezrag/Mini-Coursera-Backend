@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class clsStudent:clsUser
+    public class Student:User
     {
 
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Infrastructure.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -6,13 +7,11 @@ namespace Infrastructure
 {
     public class MiniCourseraContext:DbContext
     {
-        // DbSet properties for your entities
-        public DbSet<Domain.Entities.clsCourse> Courses { get; set; }
-        public DbSet<Domain.Entities.clsStudent> Students { get; set; }
-        public DbSet<Domain.Entities.clsInstructor> Instructors { get; set; }
+        public DbSet<Domain.Entities.Course> Courses { get; set; }
+        public DbSet<Domain.Entities.Student> Students { get; set; }
+        public DbSet<Domain.Entities.Instructor> Instructors { get; set; }
 
 
-        // Constructor
         public MiniCourseraContext(DbContextOptions<MiniCourseraContext> options) : base(options)
         {
 
@@ -21,12 +20,9 @@ namespace Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new SubjectConfig());
+            modelBuilder.ApplyConfiguration(new LanguageConfig());
 
-            // Fluent API example (optional)
-            //modelBuilder.Entity<Customer>()
-            //    .HasMany(c => c.Orders)
-            //    .WithOne(o => o.Customer)
-            //    .HasForeignKey(o => o.CustomerId);
         }
     }
 }

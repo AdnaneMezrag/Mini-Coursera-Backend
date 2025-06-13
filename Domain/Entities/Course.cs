@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class clsCourse
+    public class Course
     {
         public int Id { get; set; }
         public string Title { get; set; } = default!;
@@ -16,10 +16,16 @@ namespace Domain.Entities
         public decimal Price { get; set; } = default!;
         public DateTime CreatedAt { get; set; }
         public int InstructorID { get; set; } = default!;
-        public clsInstructor Instructor { get; set; } = default!;
-        public List<clsStudent> Students { get; set; } = new List<clsStudent>();
+        public Instructor Instructor { get; set; } = default!;
+        public List<Student> Students { get; set; } = new List<Student>();
         public int EnrollmentsCount { get; set; }
-        public clsCourse()
+        public int? SubjectID { get; set; }
+        public Subject? Subject { get; set; }
+        public int LanguageID { get; set; }
+        public Language Language { get; set; }
+        //public string Level { get; set; } = default!;
+        //public string Duration { get; set; } = default!;
+        public Course()
         {
             // Default constructor for EF Core
             CreatedAt = DateTime.UtcNow;

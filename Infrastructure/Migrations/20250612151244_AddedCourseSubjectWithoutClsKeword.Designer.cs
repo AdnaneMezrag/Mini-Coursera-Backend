@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MiniCourseraContext))]
-    partial class MiniCourseraContextModelSnapshot : ModelSnapshot
+    [Migration("20250612151244_AddedCourseSubjectWithoutClsKeword")]
+    partial class AddedCourseSubjectWithoutClsKeword
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,9 +50,6 @@ namespace Infrastructure.Migrations
                     b.Property<int>("InstructorID")
                         .HasColumnType("int");
 
-                    b.Property<int>("LanguageID")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -63,8 +63,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("InstructorID");
-
-                    b.HasIndex("LanguageID");
 
                     b.HasIndex("SubjectID");
 
@@ -105,191 +103,6 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Instructors");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Language", b =>
-                {
-                    b.Property<int>("LanguageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LanguageId"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("LanguageId");
-
-                    b.ToTable("Language");
-
-                    b.HasData(
-                        new
-                        {
-                            LanguageId = 1,
-                            Name = "English"
-                        },
-                        new
-                        {
-                            LanguageId = 2,
-                            Name = "Spanish"
-                        },
-                        new
-                        {
-                            LanguageId = 3,
-                            Name = "French"
-                        },
-                        new
-                        {
-                            LanguageId = 4,
-                            Name = "Arabic"
-                        },
-                        new
-                        {
-                            LanguageId = 5,
-                            Name = "Portuguese (Brazil)"
-                        },
-                        new
-                        {
-                            LanguageId = 6,
-                            Name = "German"
-                        },
-                        new
-                        {
-                            LanguageId = 7,
-                            Name = "Chinese (China)"
-                        },
-                        new
-                        {
-                            LanguageId = 8,
-                            Name = "Japanese"
-                        },
-                        new
-                        {
-                            LanguageId = 9,
-                            Name = "Indonesian"
-                        },
-                        new
-                        {
-                            LanguageId = 10,
-                            Name = "Russian"
-                        },
-                        new
-                        {
-                            LanguageId = 11,
-                            Name = "Korean"
-                        },
-                        new
-                        {
-                            LanguageId = 12,
-                            Name = "Hindi"
-                        },
-                        new
-                        {
-                            LanguageId = 13,
-                            Name = "Turkish"
-                        },
-                        new
-                        {
-                            LanguageId = 14,
-                            Name = "Ukrainian"
-                        },
-                        new
-                        {
-                            LanguageId = 15,
-                            Name = "Italian"
-                        },
-                        new
-                        {
-                            LanguageId = 16,
-                            Name = "Thai"
-                        },
-                        new
-                        {
-                            LanguageId = 17,
-                            Name = "Polish"
-                        },
-                        new
-                        {
-                            LanguageId = 18,
-                            Name = "Dutch"
-                        },
-                        new
-                        {
-                            LanguageId = 19,
-                            Name = "Swedish"
-                        },
-                        new
-                        {
-                            LanguageId = 20,
-                            Name = "Greek"
-                        },
-                        new
-                        {
-                            LanguageId = 21,
-                            Name = "Kazakh"
-                        },
-                        new
-                        {
-                            LanguageId = 22,
-                            Name = "Hungarian"
-                        },
-                        new
-                        {
-                            LanguageId = 23,
-                            Name = "Azerbaijani"
-                        },
-                        new
-                        {
-                            LanguageId = 24,
-                            Name = "Vietnamese"
-                        },
-                        new
-                        {
-                            LanguageId = 25,
-                            Name = "Pushto"
-                        },
-                        new
-                        {
-                            LanguageId = 26,
-                            Name = "Chinese (Traditional)"
-                        },
-                        new
-                        {
-                            LanguageId = 27,
-                            Name = "Hebrew"
-                        },
-                        new
-                        {
-                            LanguageId = 28,
-                            Name = "Portuguese"
-                        },
-                        new
-                        {
-                            LanguageId = 29,
-                            Name = "Portuguese (Portugal)"
-                        },
-                        new
-                        {
-                            LanguageId = 30,
-                            Name = "Catalan"
-                        },
-                        new
-                        {
-                            LanguageId = 31,
-                            Name = "Croatian"
-                        },
-                        new
-                        {
-                            LanguageId = 32,
-                            Name = "Kannada"
-                        },
-                        new
-                        {
-                            LanguageId = 33,
-                            Name = "Swahili"
-                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Student", b =>
@@ -416,19 +229,11 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Language", "Language")
-                        .WithMany("Courses")
-                        .HasForeignKey("LanguageID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.Subject", "Subject")
                         .WithMany("Courses")
                         .HasForeignKey("SubjectID");
 
                     b.Navigation("Instructor");
-
-                    b.Navigation("Language");
 
                     b.Navigation("Subject");
                 });
@@ -443,11 +248,6 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.Course", b =>
                 {
                     b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Language", b =>
-                {
-                    b.Navigation("Courses");
                 });
 
             modelBuilder.Entity("Domain.Entities.Subject", b =>
