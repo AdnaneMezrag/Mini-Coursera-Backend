@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Enums;
 
 namespace Domain.Entities
 {
@@ -23,11 +24,11 @@ namespace Domain.Entities
         public Subject? Subject { get; set; }
         public int LanguageID { get; set; }
         public Language Language { get; set; }
-        //public string Level { get; set; } = default!;
-        //public string Duration { get; set; } = default!;
+        public ICollection<CourseModule> CourseModules { get; set; }
+        public CourseLevel Level { get; set; } 
+
         public Course()
         {
-            // Default constructor for EF Core
             CreatedAt = DateTime.UtcNow;
         }
 

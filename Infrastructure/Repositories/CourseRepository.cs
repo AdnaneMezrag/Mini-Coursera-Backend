@@ -45,9 +45,16 @@ namespace Infrastructure.Repositories
             return Courses;
         }
 
-        public Task<Course?> GetByIdAsync(int id)
+        public async Task<Course?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var course = _miniCourseraContext.Courses
+                .Include(course => course.Instructor)
+                .Include(course => course.Subject)
+                .Include(course => course.Language)
+                .Include(course => course.CourseModules)
+                .FirstOrDefaultAsync(course => course.Id == id);
+
+            return await course;
         }
 
         public Task<List<Course>> GetAllAsync()
@@ -83,6 +90,10 @@ namespace Infrastructure.Repositories
             {
                 query = query
                 .Where(course => filterCoursesModel.SubjectIDs.Contains(course.SubjectID));
+            }
+            if (filterCoursesModel.Levels != null && filterCoursesModel.Levels.Any())
+            {
+                query = query.Where(c => filterCoursesModel.Levels.Contains(c.Level));
             }
             // The search functionality (Can be refactored)
             query = query

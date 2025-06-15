@@ -11,11 +11,19 @@ namespace Application.Mapping
         {
             //CreateMap<clsCourse, CourseReadDTO>();
             CreateMap<Course, CourseReadDTO>()
-    .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor.FullName))
-    .ForMember(dest => dest.InstructorImageUrl, opt => opt.MapFrom(src => src.Instructor.PhotoUrl));
+        .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor.FullName))
+        .ForMember(dest => dest.InstructorImageUrl, opt => opt.MapFrom(src => src.Instructor.PhotoUrl));
 
             CreateMap<FilterCoursesDTO,FilterCoursesModel >();
-            // Add other mappings as needed
+            CreateMap<CourseModule, CourseModuleDTO>();
+
+            CreateMap<Course, CourseReadFullDTO>()
+        .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor.FullName))
+        .ForMember(dest => dest.InstructorImageUrl, opt => opt.MapFrom(src => src.Instructor.PhotoUrl))
+        .ForMember(dest => dest.Language, opt => opt.MapFrom(src => src.Language.Name))
+        .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Subject.Name))
+        .ForMember(dest => dest.Modules, opt => opt.MapFrom(src => src.CourseModules));
+
         }
     }
 }
