@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Enums
 {
-    public enum CourseLevel
+    public enum UserTypeEnum
     {
-        Beginner = 1,
-        Intermediate = 2,
-        Advanced = 3,
-        Mixed = 4
+        Student = 1,
+        Instructor = 2,
     }
 }

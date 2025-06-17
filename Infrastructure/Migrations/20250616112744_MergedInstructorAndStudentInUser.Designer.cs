@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MiniCourseraContext))]
-    partial class MiniCourseraContextModelSnapshot : ModelSnapshot
+    [Migration("20250616112744_MergedInstructorAndStudentInUser")]
+    partial class MergedInstructorAndStudentInUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -411,6 +414,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -438,7 +442,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserType")
                         .HasDatabaseName("IX_Users_UserType");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("User");
 
                     b.HasData(
                         new

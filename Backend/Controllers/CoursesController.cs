@@ -10,9 +10,9 @@ namespace API.Controllers
     public class CoursesController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly clsCourseService _courseService;
+        private readonly CourseService _courseService;
 
-        public CoursesController(clsCourseService courseService, IMapper mapper)
+        public CoursesController(CourseService courseService, IMapper mapper)
         {
             _courseService = courseService;
             _mapper = mapper;

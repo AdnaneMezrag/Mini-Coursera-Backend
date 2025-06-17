@@ -7,13 +7,13 @@ using Domain.Models;
 
 namespace Application
 {
-    public class clsCourseService 
+    public class CourseService 
     {
         private readonly ICourseRepository _courseRepository;
         private readonly IImageStorageService _imageStorage;
         private readonly IMapper _mapper;
 
-        public clsCourseService(ICourseRepository courseRepository, IImageStorageService imageStorage,IMapper mapper)
+        public CourseService(ICourseRepository courseRepository, IImageStorageService imageStorage,IMapper mapper)
         {
             _courseRepository = courseRepository;
             _imageStorage = imageStorage;

@@ -17,15 +17,15 @@ namespace Domain.Entities
         public decimal Price { get; set; } = default!;
         public DateTime CreatedAt { get; set; }
         public int InstructorID { get; set; } = default!;
-        public Instructor Instructor { get; set; } = default!;
-        public List<Student> Students { get; set; } = new List<Student>();
+        public User Instructor { get; set; } = default!;
+        public List<User> Students { get; set; } = new List<User>();
         public int EnrollmentsCount { get; set; }
         public int? SubjectID { get; set; }
         public Subject? Subject { get; set; }
         public int LanguageID { get; set; }
         public Language Language { get; set; }
         public ICollection<CourseModule> CourseModules { get; set; }
-        public CourseLevel Level { get; set; } 
+        public CourseLevelEnum Level { get; set; } 
 
         public Course()
         {

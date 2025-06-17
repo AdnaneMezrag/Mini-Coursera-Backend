@@ -16,7 +16,7 @@ namespace Infrastructure.Utilities
         public async Task<string> SaveImageAsync(Stream imageStream)
         {
             if (imageStream == null || imageStream.Length == 0)
-                throw new ArgumentException("Invalid image stream");
+                return null;
 
             // Detect image format and get appropriate extension
             string fileExtension = GetImageExtension(imageStream);

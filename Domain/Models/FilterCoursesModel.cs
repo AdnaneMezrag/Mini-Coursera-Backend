@@ -12,7 +12,7 @@ namespace Domain.Models
         public string? SearchTerm { get; set; } = string.Empty;
         public List<int?>? SubjectIDs { get; set; } = new List<int?>();
         public List<int> LanguageIDs { get; set; } = new List<int>();
-        public List<CourseLevel>? Levels { get; set; } = new();  // 🔽 Enum type
+        public List<CourseLevelEnum>? Levels { get; set; } = new();  // 🔽 Enum type
 
     }
 }

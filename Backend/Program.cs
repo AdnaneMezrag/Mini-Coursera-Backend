@@ -28,10 +28,15 @@ namespace Backend
     options.UseSqlServer(connectionString)
            .EnableSensitiveDataLogging()); // Optional: shows parameters
 
-            builder.Services.AddScoped<clsCourseService>();
+            //Course
+            builder.Services.AddScoped<CourseService>();
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
-            builder.Services.AddScoped<clsCourseService>();
+            builder.Services.AddScoped<CourseService>();
             builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
+
+            //User
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             // Add services to the container.
             builder.Services.AddControllers();
