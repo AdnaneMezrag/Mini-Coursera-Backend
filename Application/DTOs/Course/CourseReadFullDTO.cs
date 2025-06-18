@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs
+namespace Application.DTOs.Course
 {
     public class CourseReadFullDTO
     {
@@ -19,7 +19,7 @@ namespace Application.DTOs
         public int EnrollmentsCount { get; set; } = default!;
         public string Language { get; set; } = default!;
         public string Level { get; set; } = default!;
-        public List<CourseModuleDTO>? Modules { get; set; }
+        public List<CourseModuleReadDTO>? Modules { get; set; }
 
     }
 }

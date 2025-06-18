@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Enums;
 
-namespace Application.DTOs
+namespace Application.DTOs.Other
 {
     public class FilterCoursesDTO
     {

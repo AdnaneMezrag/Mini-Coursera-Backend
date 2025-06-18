@@ -1,6 +1,6 @@
 ﻿using Domain.Enums;
 
-namespace Application.DTOs
+namespace Application.DTOs.User
 {
     public class UserCreateDTO
     {
@@ -10,6 +10,6 @@ namespace Application.DTOs
         // Email should be unique 
         public string Email { get; set; } = default!;
         public string Password { get; set; } = default!;
-        
+
     }
 }

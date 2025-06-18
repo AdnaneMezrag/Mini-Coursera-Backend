@@ -9,6 +9,7 @@ namespace Domain.Interfaces
 {
     public interface IUserRepository:IBaseRepository<User>
     {
+        public Task<User?> GetByEmailAndPasswordAsync(string email, string password);
 
     }
 }

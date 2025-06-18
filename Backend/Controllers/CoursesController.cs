@@ -1,6 +1,8 @@
-﻿using Application;
-using Application.DTOs;
+﻿using Application.DTOs.Course;
+using Application.DTOs.Other;
+using Application.Services;
 using AutoMapper;
+using Domain.Interfaces.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -11,11 +13,15 @@ namespace API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly CourseService _courseService;
+        private readonly IVideoService _videoService;
 
-        public CoursesController(CourseService courseService, IMapper mapper)
+        public CoursesController(CourseService courseService, IMapper mapper,
+            IVideoService videoService
+            )
         {
             _courseService = courseService;
             _mapper = mapper;
+            _videoService = videoService;
         }
 
         [HttpGet("new")]
@@ -187,7 +193,44 @@ namespace API.Controllers
         }
 
 
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadVideo(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No video uploaded.");
 
+            Stream FileStream = file.OpenReadStream();
+            string FileName = file.FileName;
+
+
+            var url = await _videoService.UploadVideoAsync(FileStream,FileName);
+            return Ok(new { videoUrl = url });
+        }
+
+
+
+        [HttpGet("modules")]
+        [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<CourseReadDTO>>> GetCourseModulesContents(
+[FromQuery] int courseId)
+        {
+            try
+            {
+                var courseModules = await _courseService.GetCourseModulesContentsAsync(courseId);
+                if (!courseModules.Any())
+                {
+                    return NotFound("No modules available");
+                }
+
+                return Ok(courseModules);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
 
     }
 }

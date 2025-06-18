@@ -1,4 +1,8 @@
 ﻿using Application.DTOs;
+using Application.DTOs.Course;
+using Application.DTOs.Enrollment;
+using Application.DTOs.Other;
+using Application.DTOs.User;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Models;
@@ -15,7 +19,7 @@ namespace Application.Mapping
         .ForMember(dest => dest.InstructorImageUrl, opt => opt.MapFrom(src => src.Instructor.PhotoUrl));
 
             CreateMap<FilterCoursesDTO,FilterCoursesModel >();
-            CreateMap<CourseModule, CourseModuleDTO>();
+            CreateMap<CourseModule, CourseModuleReadDTO>();
 
             CreateMap<Course, CourseReadFullDTO>()
         .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor.FullName))
@@ -28,6 +32,23 @@ namespace Application.Mapping
 
             //User
             CreateMap<UserCreateDTO, User>();
+            CreateMap<User, UserReadDTO>();
+
+
+
+            //Enrollment
+            CreateMap<EnrollmentCreateDTO, Enrollment>();
+
+
+            //CourseModule
+            CreateMap<CourseModule,CourseModuleReadDTO>()
+                .ForMember(dest => dest.ModuleContents, opt => opt.MapFrom(src => src.ModuleContents));
+
+
+            //ModuleContent
+            CreateMap<ModuleContent, ModuleContentReadDTO>();
         }
+
+
     }
 }

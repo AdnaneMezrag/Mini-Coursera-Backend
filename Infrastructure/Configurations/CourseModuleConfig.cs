@@ -8,6 +8,8 @@ namespace Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<CourseModule> builder)
         {
+            builder.ToTable("CourseModules");
+
             builder.HasKey(courseModule => courseModule.Id);
 
             builder.Property(courseModule => courseModule.Name)

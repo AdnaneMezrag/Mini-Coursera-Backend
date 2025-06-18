@@ -32,6 +32,14 @@ namespace Infrastructure.Repositories
 
         }
 
+        public async Task<User?> GetByEmailAndPasswordAsync(string email, string password)
+        {
+            var user = _miniCourseraContext.Users
+                .FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+            return await user;
+        }
+
+
         public Task DeleteAsync(int id)
         {
             throw new NotImplementedException();

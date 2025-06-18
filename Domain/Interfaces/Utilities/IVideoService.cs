@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Interfaces.Utilities
 {
-    public interface IImageStorageService
+    public interface IVideoService
     {
-        Task<string> SaveImageAsync(Stream imageStream);
+        Task<string> UploadVideoAsync(Stream fileStream , string fileName);
 
     }
 }

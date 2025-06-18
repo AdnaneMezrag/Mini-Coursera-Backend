@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs
 {
-    public class CourseModuleDTO
+    public class ModuleContentReadDTO
     {
+        public int Id { get; set; }
         public string Name { get; set; } = default!;
-        public string Description { get; set; } = default!;
+        public string? Content { get; set; }
+        public string? VideoUrl { get; set; }
     }
-
 }

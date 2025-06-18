@@ -1,4 +1,6 @@
 ﻿using System;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
 using Domain.Interfaces.Utilities;
 
 namespace Infrastructure.Utilities

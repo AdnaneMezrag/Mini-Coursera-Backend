@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MiniCourseraContext))]
-    partial class MiniCourseraContextModelSnapshot : ModelSnapshot
+    [Migration("20250617130340_AddedEnrollments")]
+    partial class AddedEnrollments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,7 +100,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("CourseModules");
+                    b.ToTable("CourseModule");
                 });
 
             modelBuilder.Entity("Domain.Entities.Enrollment", b =>
@@ -128,8 +131,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("StudentId", "CourseId")
-                        .IsUnique();
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Enrollments", (string)null);
                 });
@@ -344,7 +346,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CourseModuleID");
 
-                    b.ToTable("ModuleContents");
+                    b.ToTable("ModuleContent");
                 });
 
             modelBuilder.Entity("Domain.Entities.Subject", b =>

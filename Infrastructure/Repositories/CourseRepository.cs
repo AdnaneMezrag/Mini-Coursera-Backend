@@ -36,7 +36,7 @@ namespace Infrastructure.Repositories
                 .Take(amount)                 // Limit the number
                 .ToListAsync();
         }
-        public async Task<List<Course>> GetSearchedCoursesAsync(string searchTerm,int amount)
+        public async Task<List<Course>> GetSearchedCoursesAsync(string searchTerm, int amount)
         {
             List<Course> Courses = await _miniCourseraContext.Courses
                 .Where(course => course.Title.Contains(searchTerm) || course.Description.Contains(searchTerm))
@@ -99,10 +99,28 @@ namespace Infrastructure.Repositories
             query = query
             .Where(course => course.Title.Contains(filterCoursesModel.SearchTerm)
             || course.Description.Contains(filterCoursesModel.SearchTerm));
-            
+
 
             return await query.ToListAsync();
         }
-    
+
+        public async Task<List<CourseModule>> GetCourseModulesContentsAsync(int courseId)
+        {
+            try
+            {
+                var courseModules = await _miniCourseraContext.CourseModules
+                 .Where(cm => cm.CourseId == courseId)
+                 .Include(cm => cm.ModuleContents)
+                 .ToListAsync();
+                return courseModules;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (ex) as needed
+                throw new Exception("An error occurred while retrieving course modules and contents.", ex);
+
+            }
+
+        }
     }
 }

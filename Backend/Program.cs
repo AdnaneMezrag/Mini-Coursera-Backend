@@ -1,5 +1,5 @@
-﻿using Application;
-using Application.Mapping;
+﻿using Application.Mapping;
+using Application.Services;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -33,10 +33,15 @@ namespace Backend
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
             builder.Services.AddScoped<CourseService>();
             builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
+            builder.Services.AddScoped<IVideoService, CloudinaryVideoService>();
 
             //User
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            //Enrollment
+            builder.Services.AddScoped<EnrollmentService>();
+            builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
             // Add services to the container.
             builder.Services.AddControllers();

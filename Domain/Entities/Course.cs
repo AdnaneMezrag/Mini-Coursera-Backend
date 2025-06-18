@@ -18,7 +18,7 @@ namespace Domain.Entities
         public DateTime CreatedAt { get; set; }
         public int InstructorID { get; set; } = default!;
         public User Instructor { get; set; } = default!;
-        public List<User> Students { get; set; } = new List<User>();
+        public ICollection<Enrollment> Enrollments { get; set; }
         public int EnrollmentsCount { get; set; }
         public int? SubjectID { get; set; }
         public Subject? Subject { get; set; }

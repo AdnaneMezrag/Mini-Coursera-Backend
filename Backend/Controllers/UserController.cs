@@ -1,6 +1,7 @@
 ﻿using API.DTO;
-using Application;
-using Application.DTOs;
+using Application.DTOs.Course;
+using Application.DTOs.User;
+using Application.Services;
 using AutoMapper;
 using Azure.Core;
 using Microsoft.AspNetCore.Http;
@@ -27,8 +28,10 @@ namespace API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateUser([FromForm] UserCreateDTO userCreateDTO,[FromForm]IFormFile? image)
+        public async Task<IActionResult> CreateUser([FromForm]UserDTO userDTO)
         {
+            UserCreateDTO userCreateDTO = userDTO.userCreateDTO;
+            IFormFile? image = userDTO.image;
             if (userCreateDTO == null)
             {
                 return BadRequest("User data is null");
@@ -55,6 +58,33 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred while creating the user: {ex.Message}");
+            }
+        }
+
+
+
+
+        [HttpGet("login")]
+        [ProducesResponseType(typeof(CourseReadFullDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CourseReadFullDTO>> GetUserByEmailAndPassword(
+    string email,string password)
+        {
+            try
+            {
+                var user = await _userService.GetByEmailAndPasswordAsync(email,password);
+                if (user == null)
+                {
+                    return NotFound("No available user");
+                }
+
+                var userDTO = _mapper.Map<UserReadDTO>(user);
+                return Ok(userDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
             }
         }
 
