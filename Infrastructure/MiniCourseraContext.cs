@@ -13,6 +13,7 @@ namespace Infrastructure
         public DbSet<Domain.Entities.Enrollment> Enrollments { get; set; }
         public DbSet<Domain.Entities.CourseModule> CourseModules { get; set; }
         public DbSet<Domain.Entities.ModuleContent> ModuleContents { get; set; }
+        public DbSet<Domain.Entities.EnrollmentProgress> EnrollmentProgresses { get; set; }
 
         public MiniCourseraContext(DbContextOptions<MiniCourseraContext> options) : base(options)
         {
@@ -26,6 +27,8 @@ namespace Infrastructure
             modelBuilder.ApplyConfiguration(new LanguageConfig());
             modelBuilder.ApplyConfiguration(new UserConfig());
             modelBuilder.ApplyConfiguration(new EnrollmentConfig());
+            modelBuilder.ApplyConfiguration(new EnrollmentProgressConfiguration());
+
         }
     }
 }

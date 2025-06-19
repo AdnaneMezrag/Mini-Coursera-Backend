@@ -12,8 +12,9 @@ namespace Domain.Entities
         public DateTime EnrollmentDate { get; set; } = DateTime.Now;
         public bool IsCompleted { get; set; } = false;
         public int StudentId { get; set; } = default!;
-        public User Student { get; set; }
+        public User? Student { get; set; }
         public int CourseId { get; set; } = default!;
-        public Course Course { get; set; }
+        public Course? Course { get; set; }
+        public ICollection< EnrollmentProgress>? enrollmentProgresses { get; set; }
     }
 }
