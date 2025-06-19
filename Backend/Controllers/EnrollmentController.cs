@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Enrollment;
+﻿using Application.DTOs.Course;
+using Application.DTOs.Enrollment;
 using Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,32 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error adding enrollment: {ex.Message}");
+            }
+        }
+
+
+
+
+        [HttpGet("student/{studentId}")]
+        [ProducesResponseType(typeof(List<EnrollmentReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<EnrollmentReadDTO>>> GetEnrolledCoursesByStudentId(
+int studentId)
+        {
+            try
+            {
+                var enrollmentReadDTOs = await _enrollmentService.GetEnrolledCoursesByStudentId(studentId);
+                if (!enrollmentReadDTOs.Any())
+                {
+                    return NotFound("No enrolled courses available");
+                }
+
+                return Ok(enrollmentReadDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
             }
         }
 

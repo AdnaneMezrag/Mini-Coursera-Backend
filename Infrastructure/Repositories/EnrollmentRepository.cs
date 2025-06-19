@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -21,6 +22,27 @@ namespace Infrastructure.Repositories
             await _miniCourseraContext.AddAsync(entity);
             _miniCourseraContext.SaveChanges();
         }
+
+        public async Task<List<Enrollment>> GetEnrolledCoursesByStudentId(int studentId)
+        {
+            try
+            {
+                var enrolledCourses = await _miniCourseraContext.Enrollments
+                    .Where(enrollment => enrollment.StudentId == studentId)
+                    .Include(Enrollment => Enrollment.Course)
+                    .ToListAsync();
+                return enrolledCourses;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (ex) as needed
+                throw new Exception("An error occurred while retrieving enrolled courses", ex);
+
+            }
+
+        }
+
+
 
         public Task DeleteAsync(int id)
         {

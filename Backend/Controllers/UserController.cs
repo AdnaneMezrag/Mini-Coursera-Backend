@@ -65,10 +65,10 @@ namespace API.Controllers
 
 
         [HttpGet("login")]
-        [ProducesResponseType(typeof(CourseReadFullDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserReadDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CourseReadFullDTO>> GetUserByEmailAndPassword(
+        public async Task<ActionResult<UserReadDTO>> GetUserByEmailAndPassword(
     string email,string password)
         {
             try

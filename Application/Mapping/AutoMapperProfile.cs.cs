@@ -47,6 +47,12 @@ namespace Application.Mapping
 
             //ModuleContent
             CreateMap<ModuleContent, ModuleContentReadDTO>();
+
+
+
+            //Enrollment
+            CreateMap<Enrollment, EnrollmentReadDTO>()
+                .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Course.Title));
         }
 
 

@@ -27,5 +27,13 @@ namespace Application.Services
             await _enrollmentRepository.AddAsync(enrollment);
         }
 
+        public async Task<List<EnrollmentReadDTO>> GetEnrolledCoursesByStudentId(int studentId)
+        {
+            List<Enrollment> enrollments = await _enrollmentRepository
+                .GetEnrolledCoursesByStudentId(studentId);
+
+            return _mapper.Map<List<EnrollmentReadDTO>>(enrollments);
+        }
+
     }
 }
