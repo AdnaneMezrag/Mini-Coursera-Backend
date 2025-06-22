@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Course;
+﻿using System.Runtime.CompilerServices;
+using Application.DTOs.Course;
 using Application.DTOs.Enrollment;
 using Application.Services;
 using Microsoft.AspNetCore.Http;
@@ -57,6 +58,36 @@ int studentId)
                 }
 
                 return Ok(enrollmentReadDTOs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
+
+
+
+        [HttpGet("by-course-and-student")]
+        [ProducesResponseType(typeof(List<EnrollmentReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<EnrollmentReadDTO>> GetEnrollmentByCourseIdAndStudentId(
+     int courseId , int studentId)
+        {
+            if(courseId <= 0 ||  studentId <= 0)
+            {
+                return BadRequest("CourseId and/or StudentId should be > 0");
+            }
+            try
+            {
+                var enrollment = await _enrollmentService.GetEnrollmentByCourseIdAndStudentId(courseId,studentId);
+                if (enrollment == null)
+                {
+                    return NotFound("No enrollment is available");
+                }
+
+                return Ok(enrollment);
             }
             catch (Exception ex)
             {

@@ -22,7 +22,7 @@ namespace Domain.Entities
         public int EnrollmentsCount { get; set; }
         public int? SubjectID { get; set; }
         public Subject? Subject { get; set; }
-        public int LanguageID { get; set; }
+        public int LanguageID { get; set; } = 1;
         public Language Language { get; set; }
         public ICollection<CourseModule> CourseModules { get; set; }
         public CourseLevelEnum Level { get; set; } 

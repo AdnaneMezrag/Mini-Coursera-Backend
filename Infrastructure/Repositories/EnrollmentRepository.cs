@@ -42,7 +42,14 @@ namespace Infrastructure.Repositories
 
         }
 
-
+        public async Task<Enrollment?> GetEnrollmentByCourseIdAndStudentId(int courseId, int studentId)
+        {
+            return await _miniCourseraContext.Enrollments
+                .Include(enrollment => enrollment.enrollmentProgresses)
+                .FirstOrDefaultAsync(
+                enrollment => enrollment.CourseId == courseId && 
+                enrollment.StudentId == studentId);
+        }
 
         public Task DeleteAsync(int id)
         {

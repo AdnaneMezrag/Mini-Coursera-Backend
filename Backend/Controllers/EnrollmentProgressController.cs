@@ -17,7 +17,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] EnrollmentProgressCreateDTO request)
+        public async Task<IActionResult> Create([FromBody] EnrollmentProgressCreateDTO request)
         {
             if ( request.ModuleContentId <= 0 || request.EnrollmentId< 0)
                 return BadRequest("Verify the data you have entered");

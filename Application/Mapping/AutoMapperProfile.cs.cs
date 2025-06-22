@@ -53,12 +53,14 @@ namespace Application.Mapping
 
             //Enrollment
             CreateMap<Enrollment, EnrollmentReadDTO>()
-                .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Course.Title));
+                .ForMember(dest => dest.CourseTitle, opt => opt.MapFrom(src => src.Course.Title))
+                .ForMember(dest => dest.EnrollmentProgress,opt => opt.MapFrom(src => src.enrollmentProgresses));
         
         
         
             //EnrollmentProgress
-            CreateMap<EnrollmentProgressCreateDTO,EnrollmentProgress>();
+            CreateMap<EnrollmentProgress,EnrollmentProgressCreateDTO>();
+            CreateMap<EnrollmentProgressCreateDTO, EnrollmentProgress>();
         }
 
 
