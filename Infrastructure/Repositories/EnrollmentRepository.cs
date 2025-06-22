@@ -61,9 +61,19 @@ namespace Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Enrollment?> GetByIdAsync(int id)
+        public async Task<Enrollment?> GetByIdAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Enrollment?> GetEnrollmentWithProgressAndCourse(int EnrollmentId)
+        {
+            return await _miniCourseraContext.Enrollments
+                .Include(enrollment => enrollment.Course)
+                    .ThenInclude(course => course.CourseModules)
+                        .ThenInclude(courseModule => courseModule.ModuleContents)
+                .Include(enrollment => enrollment.enrollmentProgresses)
+                .FirstOrDefaultAsync(enrollment => enrollment.Id == EnrollmentId);
         }
 
         public Task UpdateAsync(Enrollment entity)

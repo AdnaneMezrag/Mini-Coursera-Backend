@@ -16,5 +16,21 @@ namespace Domain.Entities
         public int CourseId { get; set; } = default!;
         public Course? Course { get; set; }
         public ICollection< EnrollmentProgress>? enrollmentProgresses { get; set; }
+
+        public bool IsCourseCompleted()
+        {
+            var moduleContentIDs = Course.CourseModules
+                .SelectMany(courseModule => courseModule.ModuleContents)
+                .Select(moduleContent => moduleContent.Id);
+            var completedModuleContentIDs = enrollmentProgresses
+                .Select(enrollmentProgresses => enrollmentProgresses.ModuleContentId);
+            return !moduleContentIDs.Except(completedModuleContentIDs).Any();
+        }
+
+        public void CompleteCourse()
+        {
+            IsCompleted = true;
+        }
+
     }
 }

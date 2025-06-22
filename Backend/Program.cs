@@ -47,6 +47,9 @@ namespace Backend
             builder.Services.AddScoped<EnrollmentProgressService>();
             builder.Services.AddScoped<IEnrollmentProgressRepository, EnrollmentProgressRepository>();
 
+            //UnitOfWork
+            builder.Services.AddScoped<UnitOfWork>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
             // Add services to the container.

@@ -11,5 +11,6 @@ namespace Domain.Interfaces
     {
         public Task <List<Enrollment>> GetEnrolledCoursesByStudentId(int studentId);
         public Task <Enrollment> GetEnrollmentByCourseIdAndStudentId(int courseId, int studentId);
+        public Task<Enrollment?> GetEnrollmentWithProgressAndCourse(int EnrollmentId);
     }
 }

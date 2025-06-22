@@ -19,7 +19,7 @@ namespace Infrastructure.Repositories
         public async Task AddAsync(EnrollmentProgress entity)
         {
             await _miniCourseraContext.EnrollmentProgresses.AddAsync(entity);
-            await _miniCourseraContext.SaveChangesAsync(); // 🔧 You need this!
+            //await _miniCourseraContext.SaveChangesAsync(); //Achieved Using Unit of work
 
         }
 
