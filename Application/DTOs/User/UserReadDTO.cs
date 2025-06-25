@@ -15,5 +15,6 @@ namespace Application.DTOs.User
         public string? LastName { get; set; }
         // Email should be unique 
         public string Email { get; set; } = default!;
+        public string? PhotoUrl { get; set; }
     }
 }

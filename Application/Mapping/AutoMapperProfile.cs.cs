@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.DTOs.Course;
+using Application.DTOs.CourseModule;
 using Application.DTOs.Enrollment;
 using Application.DTOs.EnrollmentProgress;
 using Application.DTOs.Other;
@@ -29,7 +30,7 @@ namespace Application.Mapping
         .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Subject.Name))
         .ForMember(dest => dest.Modules, opt => opt.MapFrom(src => src.CourseModules));
 
-
+            CreateMap<CourseCreateDTO, Course > ();
 
             //User
             CreateMap<UserCreateDTO, User>();
@@ -44,6 +45,7 @@ namespace Application.Mapping
             //CourseModule
             CreateMap<CourseModule,CourseModuleReadDTO>()
                 .ForMember(dest => dest.ModuleContents, opt => opt.MapFrom(src => src.ModuleContents));
+            CreateMap<CourseModuleCreateDTO, CourseModule>();
 
 
             //ModuleContent

@@ -47,6 +47,11 @@ namespace Backend
             builder.Services.AddScoped<EnrollmentProgressService>();
             builder.Services.AddScoped<IEnrollmentProgressRepository, EnrollmentProgressRepository>();
 
+            //CourseModle
+            builder.Services.AddScoped<CourseModuleService>();
+            builder.Services.AddScoped<ICourseModuleRepository, CourseModuleRepository>();
+
+
             //UnitOfWork
             builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

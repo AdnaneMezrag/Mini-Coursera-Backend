@@ -182,14 +182,27 @@ namespace API.Controllers
 
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromForm] CourseCreateDTO request, IFormFile Image)
         {
-            if (Image == null || Image.Length == 0 || request.InstructorID <= 0 || request.Price < 0)
-                return BadRequest("Verify the data you have entered");
+            try
+            {
+                if (Image == null || Image.Length == 0 || request.InstructorID <= 0
+                    || request.Price < 0 || request.LanguageID <= 0
+                    || request?.SubjectID <= 0 || request.Level == null)
+                    return BadRequest("Verify the data you have entered");
 
-            using var stream = Image.OpenReadStream();
-            await _courseService.CreateCourseAsync(request,stream);
-            return Ok("Course created.");
+                using var stream = Image.OpenReadStream();
+                await _courseService.CreateCourseAsync(request, stream);
+                return Ok("Course created.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
         }
 
 

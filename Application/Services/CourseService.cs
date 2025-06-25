@@ -1,5 +1,5 @@
-﻿using Application.DTOs;
-using Application.DTOs.Course;
+﻿using Application.DTOs.Course;
+using Application.DTOs.CourseModule;
 using Application.DTOs.Other;
 using AutoMapper;
 using Domain.Entities;
@@ -45,12 +45,8 @@ namespace Application.Services
         public async Task CreateCourseAsync(CourseCreateDTO courseCreateDTO, Stream imageStream)
         {
             var imageUrl = await _imageStorage.SaveImageAsync(imageStream);
-            var course = new Course();
-            course.Title = courseCreateDTO.Title;
-            course.Description = courseCreateDTO.Description;
+            Course course = _mapper.Map<Course>(courseCreateDTO);
             course.ImageUrl = imageUrl;
-            course.Price = courseCreateDTO.Price;
-            course.InstructorID = courseCreateDTO.InstructorID;
             await _courseRepository.AddAsync(course);
         }
 
