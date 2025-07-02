@@ -9,6 +9,6 @@ namespace Domain.Interfaces.Utilities
     public interface IVideoService
     {
         Task<string> UploadVideoAsync(Stream fileStream , string fileName);
-
+        Task<bool> DeleteVideoAsync(string url);
     }
 }

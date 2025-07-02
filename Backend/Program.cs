@@ -51,6 +51,10 @@ namespace Backend
             builder.Services.AddScoped<CourseModuleService>();
             builder.Services.AddScoped<ICourseModuleRepository, CourseModuleRepository>();
 
+            //ModuleContent
+            builder.Services.AddScoped<ModuleContentService>();
+            builder.Services.AddScoped<IModuleContentRepository, ModuleContentRepository>();
+
 
             //UnitOfWork
             builder.Services.AddScoped<UnitOfWork>();

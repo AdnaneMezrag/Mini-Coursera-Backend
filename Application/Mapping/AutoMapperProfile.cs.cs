@@ -1,8 +1,8 @@
-﻿using Application.DTOs;
-using Application.DTOs.Course;
+﻿using Application.DTOs.Course;
 using Application.DTOs.CourseModule;
 using Application.DTOs.Enrollment;
 using Application.DTOs.EnrollmentProgress;
+using Application.DTOs.ModuleContent;
 using Application.DTOs.Other;
 using Application.DTOs.User;
 using AutoMapper;
@@ -50,7 +50,9 @@ namespace Application.Mapping
 
             //ModuleContent
             CreateMap<ModuleContent, ModuleContentReadDTO>();
-
+            CreateMap<ModuleContentCreateDTO, ModuleContent>();
+            CreateMap<ModuleContentReadDTO, ModuleContent>();
+            CreateMap<ModuleContentUpdateDTO, ModuleContent>();
 
 
             //Enrollment

@@ -14,6 +14,16 @@ namespace Infrastructure.Utilities
     {
         private readonly Cloudinary _cloudinary;
 
+        private string ExtractPublicIdFromUrl(string videoUrl)
+        {
+            var uri = new Uri(videoUrl);
+            var segments = uri.AbsolutePath.Split('/');
+            var filename = segments.Last(); // e.g. "abc123_xyz.mp4"
+            var folder = segments[^2];      // e.g. "course_videos"
+            var publicId = Path.Combine(folder, Path.GetFileNameWithoutExtension(filename)).Replace('\\', '/');
+            return publicId;
+        }
+
         public CloudinaryVideoService(IConfiguration config)
         {
             var cloudName = config["Cloudinary:CloudName"];
@@ -26,16 +36,41 @@ namespace Infrastructure.Utilities
 
         public async Task<string> UploadVideoAsync(Stream fileStream, string fileName)
         {
+            var uniqueFileName = $"{Guid.NewGuid()}_{fileName}";
+
             var uploadParams = new VideoUploadParams()
             {
-                File = new FileDescription(fileName, fileStream),
+                File = new FileDescription(uniqueFileName, fileStream),
                 Folder = "course_videos"
             };
-
-            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-            return uploadResult.SecureUrl.ToString();
+            try
+            {
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                return uploadResult.SecureUrl.ToString();
+            }
+            catch
+            {
+                return null;
+            }
         }
+        
+        public async Task<bool> DeleteVideoAsync(string? url)
+        {
+            if (url == null || url == "") return false;
+            string publicId = ExtractPublicIdFromUrl(url);
+            var deletionParams = new DeletionParams(publicId)
+            {
+                ResourceType = ResourceType.Video
+            };
 
+            var deletionResult = await _cloudinary.DestroyAsync(deletionParams);
+
+            if (deletionResult.Result != "ok")
+            {
+                return false;
+            }
+            return true;
+        }
 
     }
 }

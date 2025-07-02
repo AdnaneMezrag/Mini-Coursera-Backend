@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs
+namespace Application.DTOs.ModuleContent
 {
-    public class ModuleContentReadDTO
+    public class ModuleContentCreateDTO
     {
-        public int Id { get; set; }
         public string Name { get; set; } = default!;
         public string? Content { get; set; }
-        public string? VideoUrl { get; set; }
+        public int CourseModuleID { get; set; } = default!;
     }
+
 }

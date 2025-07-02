@@ -15,12 +15,22 @@ namespace Infrastructure.Configurations
         {
             builder.ToTable("EnrollmentProgresses");
 
-            // Composite unique constraint
             builder.HasIndex(e => new { e.EnrollmentId, e.ModuleContentId })
                    .IsUnique();
 
-            // Index on EnrollmentId
             builder.HasIndex(e => e.EnrollmentId);
+
+            builder.HasOne(e => e.Enrollment)
+                   .WithMany(e => e.enrollmentProgresses)
+                   .HasForeignKey(e => e.EnrollmentId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(e => e.ModuleContent)
+                   .WithMany() // no navigation property on ModuleContent
+                   .HasForeignKey(e => e.ModuleContentId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+
         }
     }
 
