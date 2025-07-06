@@ -1,67 +1,79 @@
 ﻿using System;
-using CloudinaryDotNet.Actions;
+using System.IO;
+using System.Threading.Tasks;
 using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Domain.Interfaces.Utilities;
+using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Utilities
 {
-    // Infrastructure.Services
     public class LocalImageStorageService : IImageStorageService
     {
-        private readonly string _imageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+        private readonly Cloudinary _cloudinary;
 
-        public static string GetGuid()
+        public LocalImageStorageService(IConfiguration config)
         {
-            return Guid.NewGuid().ToString();
+            var cloudName = config["Cloudinary:CloudName"];
+            var apiKey = config["Cloudinary:ApiKey"];
+            var apiSecret = config["Cloudinary:ApiSecret"];
+
+            Account account = new Account(cloudName, apiKey, apiSecret);
+            _cloudinary = new Cloudinary(account);
         }
 
         public async Task<string> SaveImageAsync(Stream imageStream)
         {
-            if (imageStream == null || imageStream.Length == 0)
-                return null;
-
-            // Detect image format and get appropriate extension
-            string fileExtension = GetImageExtension(imageStream);
-            string fileName = $"{GetGuid()}{fileExtension}";
-
-            Directory.CreateDirectory(_imageFolder);
-
-            var filePath = Path.Combine(_imageFolder, fileName);
-
-            // Reset position in case we read from the stream for detection
-            imageStream.Position = 0;
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await imageStream.CopyToAsync(fileStream);
-            }
+                if (imageStream == null || imageStream.Length == 0)
+                    return null;
 
-            string baseUrl = "https://localhost:7124"; // Adjust this as needed
-            return $"{baseUrl}/images/{fileName}";
+                var uniqueFileName = $"{Guid.NewGuid()}.jpg"; // Optional: detect format
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(uniqueFileName, imageStream),
+                    Folder = "course_images"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                return uploadResult.SecureUrl.ToString();
+            }
+            catch
+            {
+                return null;
+            }       
         }
 
-        private string GetImageExtension(Stream stream)
+        public async Task<bool> DeleteImageAsync(string imageUrl)
         {
-            // Read the first few bytes to detect the signature
-            var buffer = new byte[8];
-            var bytesRead = stream.Read(buffer, 0, buffer.Length);
-            stream.Position = 0; // Reset position after reading
+            try
+            {
+                if (string.IsNullOrWhiteSpace(imageUrl)) return false;
 
-            if (bytesRead < 2) return ".dat"; // fallback
+                var publicId = ExtractPublicIdFromUrl(imageUrl);
 
-            // Check for common image formats
-            if (buffer[0] == 0xFF && buffer[1] == 0xD8) return ".jpg";
-            if (buffer[0] == 0x89 && buffer[1] == 0x50 &&
-                buffer[2] == 0x4E && buffer[3] == 0x47) return ".png";
-            if (buffer[0] == 0x47 && buffer[1] == 0x49 &&
-                buffer[2] == 0x46) return ".gif";
-            if (buffer[0] == 0x42 && buffer[1] == 0x4D) return ".bmp";
-            if (buffer[0] == 0x52 && buffer[1] == 0x49 &&
-                buffer[2] == 0x46 && buffer[3] == 0x46) return ".webp";
+                var deletionParams = new DeletionParams(publicId)
+                {
+                    ResourceType = ResourceType.Image
+                };
 
-            return ".dat"; // default fallback
+                var result = await _cloudinary.DestroyAsync(deletionParams);
+                return result.Result == "ok";
+            }
+            catch { 
+                return false;
+            }
+        }
+
+        private string ExtractPublicIdFromUrl(string url)
+        {
+            var uri = new Uri(url);
+            var segments = uri.AbsolutePath.Split('/');
+            var filename = segments.Last();         // abc123_xyz.jpg
+            var folder = segments[^2];              // course_images
+            var publicId = Path.Combine(folder, Path.GetFileNameWithoutExtension(filename)).Replace('\\', '/');
+            return publicId;
         }
 
     }
-
 }

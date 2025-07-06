@@ -13,6 +13,15 @@ namespace Infrastructure.Utilities
     public class CloudinaryVideoService:IVideoService
     {
         private readonly Cloudinary _cloudinary;
+        public CloudinaryVideoService(IConfiguration config)
+        {
+            var cloudName = config["Cloudinary:CloudName"];
+            var apiKey = config["Cloudinary:ApiKey"];
+            var apiSecret = config["Cloudinary:ApiSecret"];
+
+            Account account = new Account(cloudName, apiKey, apiSecret);
+            _cloudinary = new Cloudinary(account);
+        }
 
         private string ExtractPublicIdFromUrl(string videoUrl)
         {
@@ -22,16 +31,6 @@ namespace Infrastructure.Utilities
             var folder = segments[^2];      // e.g. "course_videos"
             var publicId = Path.Combine(folder, Path.GetFileNameWithoutExtension(filename)).Replace('\\', '/');
             return publicId;
-        }
-
-        public CloudinaryVideoService(IConfiguration config)
-        {
-            var cloudName = config["Cloudinary:CloudName"];
-            var apiKey = config["Cloudinary:ApiKey"];
-            var apiSecret = config["Cloudinary:ApiSecret"];
-
-            Account account = new Account(cloudName, apiKey, apiSecret);
-            _cloudinary = new Cloudinary(account);
         }
 
         public async Task<string> UploadVideoAsync(Stream fileStream, string fileName)

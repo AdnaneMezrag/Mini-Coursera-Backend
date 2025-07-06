@@ -571,7 +571,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.ModuleContent", "ModuleContent")
                         .WithMany()
                         .HasForeignKey("ModuleContentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Enrollment");

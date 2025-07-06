@@ -44,7 +44,6 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
             return Courses;
         }
-
         public async Task<Course?> GetByIdAsync(int id)
         {
             var course = _miniCourseraContext.Courses
@@ -56,28 +55,38 @@ namespace Infrastructure.Repositories
 
             return await course;
         }
-
-        public Task<List<Course>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
         public Task AddAsync(Course entity)
         {
             _miniCourseraContext.Courses.Add(entity);
             return _miniCourseraContext.SaveChangesAsync();
         }
+        public async Task UpdateAsync(Course entity)
+        {
+            var existingCourse = await _miniCourseraContext.Courses.FindAsync(entity.Id);
+            if (existingCourse == null)
+                throw new Exception("Course not found");
 
-        public Task UpdateAsync(Course entity)
+            existingCourse.Title = entity.Title;
+            existingCourse.Description = entity.Description;
+            existingCourse.Price = entity.Price;
+            if(entity.ImageUrl != existingCourse.ImageUrl) existingCourse.ImageUrl = entity.ImageUrl;
+            existingCourse.SubjectID = entity.SubjectID;
+            existingCourse.LanguageID = entity.LanguageID;
+            existingCourse.Level = entity.Level;
+
+            await _miniCourseraContext.SaveChangesAsync();
+        }
+
+
+
+        public Task<List<Course>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
-
         public Task DeleteAsync(int id)
         {
             throw new NotImplementedException();
         }
-
         public async Task<List<Course>> GetCoursesByFilterAsync(FilterCoursesModel filterCoursesModel)
         {
             var query = _miniCourseraContext.Courses.AsQueryable();

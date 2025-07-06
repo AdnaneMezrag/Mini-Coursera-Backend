@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Course;
+using Application.DTOs.CourseModule;
 using Application.DTOs.Other;
 using Application.Services;
 using AutoMapper;
@@ -102,31 +103,6 @@ namespace API.Controllers
 
 
 
- //       [HttpGet("search")]
- //       [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
- //       [ProducesResponseType(StatusCodes.Status500InternalServerError)]
- //       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
- //       public async Task<ActionResult<List<CourseReadDTO>>> GetSearchedCourses(
- //string? searchTerm="", int limit = 12)
- //       {
- //           try
- //           {
- //               var courses = await _courseService.GetSearchedCoursesAsync(searchTerm,limit);
- //               if (!courses.Any())
- //               {
- //                   return NotFound("No courses available");
- //               }
-
- //               var courseDtos = _mapper.Map<List<CourseReadDTO>>(courses);
- //               return Ok(courseDtos);
- //           }
- //           catch (Exception ex)
- //           {
- //               return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
- //           }
-
-
-
         [HttpGet("search")]
         [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -195,8 +171,8 @@ namespace API.Controllers
                     return BadRequest("Verify the data you have entered");
 
                 using var stream = Image.OpenReadStream();
-                await _courseService.CreateCourseAsync(request, stream);
-                return Ok("Course created.");
+                int courseId = await _courseService.CreateCourseAsync(request, stream);
+                return Ok(courseId);
             }
             catch (Exception ex)
             {
@@ -206,32 +182,17 @@ namespace API.Controllers
         }
 
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadVideo(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                return BadRequest("No video uploaded.");
-
-            Stream FileStream = file.OpenReadStream();
-            string FileName = file.FileName;
-
-
-            var url = await _videoService.UploadVideoAsync(FileStream,FileName);
-            return Ok(new { videoUrl = url });
-        }
-
-
 
         [HttpGet("modules")]
-        [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<CourseModuleReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<CourseReadDTO>>> GetCourseModulesContents(
+        public async Task<ActionResult<List<CourseModuleReadDTO>>> GetCourseModulesContents(
 [FromQuery] int courseId)
         {
             try
             {
-                var courseModules = await _courseService.GetCourseModulesContentsAsync(courseId);
+                List<CourseModuleReadDTO> courseModules = await _courseService.GetCourseModulesContentsAsync(courseId);
                 if (!courseModules.Any())
                 {
                     return NotFound("No modules available");
@@ -247,6 +208,28 @@ namespace API.Controllers
 
 
 
+        [HttpPut("{Id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update(int Id, [FromForm] CourseCreateDTO request, IFormFile? Image)
+        {
+            try
+            {
+                if (request.Price < 0 || request.LanguageID <= 0
+                    || request?.SubjectID <= 0 || request.Level == null)
+                    return BadRequest("Verify the data you have entered");
+
+                using var stream = Image?.OpenReadStream();
+                await _courseService.UpdateCourseAsync(Id,request, stream);
+                return Ok("Updated successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
 
 
     }

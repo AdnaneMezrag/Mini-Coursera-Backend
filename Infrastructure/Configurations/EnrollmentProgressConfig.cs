@@ -27,8 +27,7 @@ namespace Infrastructure.Configurations
 
             builder.HasOne(e => e.ModuleContent)
                    .WithMany() // no navigation property on ModuleContent
-                   .HasForeignKey(e => e.ModuleContentId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .HasForeignKey(e => e.ModuleContentId);
 
 
         }
