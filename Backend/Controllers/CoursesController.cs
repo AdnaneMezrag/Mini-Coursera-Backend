@@ -232,5 +232,30 @@ namespace API.Controllers
         }
 
 
+
+        [HttpGet("instructorCourses")]
+        [ProducesResponseType(typeof(List<CourseReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<CourseReadDTO>>> GetInstructorCourses(int instructorId)
+        {
+            try
+            {
+                var courses = await _courseService.GetInstructorCoursesAsync(instructorId);
+                if (!courses.Any())
+                {
+                    return NotFound("No courses available");
+                }
+
+                var courseDtos = _mapper.Map<List<CourseReadDTO>>(courses);
+                return Ok(courseDtos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
+
+
     }
 }

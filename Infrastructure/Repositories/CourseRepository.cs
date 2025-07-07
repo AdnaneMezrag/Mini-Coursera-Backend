@@ -76,7 +76,12 @@ namespace Infrastructure.Repositories
 
             await _miniCourseraContext.SaveChangesAsync();
         }
-
+        public async Task<List<Course>> GetInstructorCoursesAsync(int instructorId)
+        {
+            return await _miniCourseraContext.Courses
+                .Where(course => course.InstructorID == instructorId)
+                .ToListAsync();
+        }
 
 
         public Task<List<Course>> GetAllAsync()

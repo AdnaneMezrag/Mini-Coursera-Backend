@@ -16,6 +16,7 @@ namespace Application.Services
         private readonly IEnrollmentRepository _enrollmentRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+
         public EnrollmentProgressService(IEnrollmentProgressRepository enrollmentProgressRepository,
             IMapper mapper, IUnitOfWork unitOfWork, IEnrollmentRepository enrollmentRepository)
         {
@@ -31,11 +32,11 @@ namespace Application.Services
             await _enrollmentProgressRepository.AddAsync(enrollmentProgress);
 
             Enrollment enrollment = await _enrollmentRepository.GetEnrollmentWithProgressAndCourse(enrollmentProgress.EnrollmentId);
-            if (enrollment.IsCourseCompleted())
+            if (enrollment != null && enrollment.IsCourseCompleted())
             {
                 enrollment.CompleteCourse();
             }
-            _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
         }
 
 

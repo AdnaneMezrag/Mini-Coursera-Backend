@@ -80,6 +80,10 @@ namespace Application.Services
             updatedCourse.ImageUrl = imageUrl;
             await _courseRepository.UpdateAsync(updatedCourse);
         }
+        public async Task<List<Course>> GetInstructorCoursesAsync(int instructorId)
+        {
+            return await _courseRepository.GetInstructorCoursesAsync(instructorId);
+        }
 
     }
 }
