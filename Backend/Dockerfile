@@ -1,27 +1,23 @@
-# ---------- Build Stage ----------
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj files and restore
-COPY Backend.sln ./
-COPY API/API.csproj ./API/
+COPY Backend/Backend.sln ./
+COPY Backend/Backend.csproj ./Backend/
 COPY Application/Application.csproj ./Application/
 COPY Domain/Domain.csproj ./Domain/
 COPY Infrastructure/Infrastructure.csproj ./Infrastructure/
 
-RUN dotnet restore ./API/API.csproj
+RUN dotnet restore
 
-# Copy all source code
 COPY . .
 
-# Publish the API project
-RUN dotnet publish API/API.csproj -c Release -o /app/publish
+WORKDIR /src/Backend
+RUN dotnet build --no-restore -c Release
+RUN dotnet publish -c Release -o /app/publish
 
-# ---------- Runtime Stage ----------
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+# Runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/publish ./
+COPY --from=build /app/publish .
 
-EXPOSE 80
-
-ENTRYPOINT ["dotnet", "API.dll"]
+ENTRYPOINT ["dotnet", "Backend.dll"]
