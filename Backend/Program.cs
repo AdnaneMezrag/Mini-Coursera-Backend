@@ -97,6 +97,7 @@ namespace Backend
             app.UseAuthorization();
             app.UseStaticFiles();
             app.MapControllers();
+            app.MapGet("/", () => "Mini Coursera Backend is live!");
 
             app.Run();
         }
