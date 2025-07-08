@@ -21,8 +21,9 @@ COPY Infrastructure/ ./Infrastructure/
 
 # Build and publish
 WORKDIR /src/Backend
-RUN dotnet build --no-restore -c Release
+RUN dotnet build API.csproj --no-restore -c Release
 RUN dotnet publish API.csproj --no-restore -c Release -o /app/publish
+
 
 # Runtime Image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
