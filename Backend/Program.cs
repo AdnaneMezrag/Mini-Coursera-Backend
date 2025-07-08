@@ -75,6 +75,22 @@ namespace Backend
                 return config.CreateMapper();
             });
 
+            //Cors for production
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins(
+                        "https://mini-coursera-frontend.vercel.app"
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
+
+
+
+
 
             // No named CORS policy needed
             var app = builder.Build();
