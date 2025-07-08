@@ -3,10 +3,11 @@ WORKDIR /src
 
 # Copy solution and project files
 COPY Backend/Backend.sln ./
-COPY Backend/API.csproj Backend/
-COPY Application/Application.csproj Application/
-COPY Domain/Domain.csproj Domain/
-COPY Infrastructure/Infrastructure.csproj Infrastructure/
+COPY Backend Backend/
+COPY Application Application/
+COPY Domain Domain/
+COPY Infrastructure Infrastructure/
+
 
 # Restore dependencies
 RUN dotnet restore "Backend.sln"
