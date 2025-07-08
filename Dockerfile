@@ -9,7 +9,7 @@ COPY Domain/Domain.csproj Domain/
 COPY Infrastructure/Infrastructure.csproj Infrastructure/
 
 # Restore dependencies
-RUN dotnet restore "Backend/Backend.sln"
+RUN dotnet restore "Backend.sln"
 
 # Copy the full source code
 COPY . .
