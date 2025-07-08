@@ -17,99 +17,90 @@ namespace Backend
     {
         public static void Main(string[] args)
         {
-
             var builder = WebApplication.CreateBuilder(args);
-
-
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<MiniCourseraContext>(options =>
-    options.UseSqlServer(connectionString)
-           .EnableSensitiveDataLogging()); // Optional: shows parameters
+                options.UseSqlServer(connectionString)
+                       .EnableSensitiveDataLogging());
 
-            //Course
+            // Course
             builder.Services.AddScoped<CourseService>();
             builder.Services.AddScoped<ICourseRepository, CourseRepository>();
-            builder.Services.AddScoped<CourseService>();
             builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
             builder.Services.AddScoped<IVideoService, CloudinaryVideoService>();
 
-            //User
+            // User
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-            //Enrollment
+            // Enrollment
             builder.Services.AddScoped<EnrollmentService>();
             builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
-            //EnrollmentProgress
+            // EnrollmentProgress
             builder.Services.AddScoped<EnrollmentProgressService>();
             builder.Services.AddScoped<IEnrollmentProgressRepository, EnrollmentProgressRepository>();
 
-            //CourseModle
+            // CourseModule
             builder.Services.AddScoped<CourseModuleService>();
             builder.Services.AddScoped<ICourseModuleRepository, CourseModuleRepository>();
 
-            //ModuleContent
+            // ModuleContent
             builder.Services.AddScoped<ModuleContentService>();
             builder.Services.AddScoped<IModuleContentRepository, ModuleContentRepository>();
 
-
-            //UnitOfWork
+            // UnitOfWork
             builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-
-            // Add services to the container.
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // AutoMapper
             builder.Services.AddSingleton<IMapper>(sp =>
             {
                 var config = new MapperConfiguration(cfg =>
                 {
-                    cfg.AddProfile<AutoMapperProfile>();  // Your profile class
+                    cfg.AddProfile<AutoMapperProfile>();
                 });
-
                 return config.CreateMapper();
             });
 
-            //Cors for production
+            // Add Controllers and Swagger
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            // ✅ CORS for Production
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins(
-                        "https://mini-coursera-frontend.vercel.app"
-                    )
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    policy.WithOrigins("https://mini-coursera-frontend.vercel.app")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
                 });
             });
 
-
-
-
-
-            // No named CORS policy needed
             var app = builder.Build();
 
-            // Enable Swagger only in development
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
 
-                // ✅ Allow all origins in development
+                // Allow all in development
                 app.UseCors(policy =>
                     policy.AllowAnyOrigin()
                           .AllowAnyHeader()
                           .AllowAnyMethod());
             }
+            else
+            {
+                // ✅ Use named CORS policy in production
+                app.UseCors("AllowFrontend");
+            }
 
             app.UseHttpsRedirection();
-
             app.UseAuthorization();
             app.UseStaticFiles();
             app.MapControllers();
