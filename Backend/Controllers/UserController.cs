@@ -53,7 +53,7 @@ namespace API.Controllers
 
                 await _userService.CreateUserAsync(userCreateDTO, imageStream);
 
-                return CreatedAtAction(nameof(CreateUser), new { id = userCreateDTO }, userCreateDTO);
+                return Ok("User created successfully");
             }
             catch (Exception ex)
             {

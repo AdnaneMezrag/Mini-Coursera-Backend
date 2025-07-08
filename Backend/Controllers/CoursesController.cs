@@ -257,5 +257,27 @@ namespace API.Controllers
         }
 
 
+
+
+        [HttpGet("enrollmentsCount")]
+        [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetEnrollmentsCountByCourseIdAsync(int courseId)
+        {
+            try
+            {
+                if (courseId <= 0) return BadRequest("CourseId should be strictly greater than 0");
+                int enrollmentsCount = await _courseService.GetEnrollmentsCountByCourseId(courseId);
+                return Ok(enrollmentsCount);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request");
+            }
+        }
+
+
+
     }
 }

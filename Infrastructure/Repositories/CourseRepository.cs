@@ -34,6 +34,7 @@ namespace Infrastructure.Repositories
             return await _miniCourseraContext.Courses
                 .OrderBy(c => Guid.NewGuid()) // Randomize
                 .Take(amount)                 // Limit the number
+                .Include(course => course.Instructor)
                 .ToListAsync();
         }
         public async Task<List<Course>> GetSearchedCoursesAsync(string searchTerm, int amount)
@@ -82,6 +83,13 @@ namespace Infrastructure.Repositories
                 .Where(course => course.InstructorID == instructorId)
                 .ToListAsync();
         }
+        public async Task<int> GetEnrollmentsCountByCourseId(int courseId)
+        {
+            int count = await _miniCourseraContext.Enrollments
+                .CountAsync(enrollment => enrollment.CourseId == courseId);
+            return count;
+        }
+
 
 
         public Task<List<Course>> GetAllAsync()

@@ -17,6 +17,6 @@ namespace Domain.Interfaces
         public Task<List<Course>> GetCoursesByFilterAsync(FilterCoursesModel filterCoursesModel);
         public Task<List<CourseModule>> GetCourseModulesContentsAsync(int courseID);
         public Task<List<Course>> GetInstructorCoursesAsync(int instructorId);
-
+        public Task<int> GetEnrollmentsCountByCourseId(int courseId);
     }
 }

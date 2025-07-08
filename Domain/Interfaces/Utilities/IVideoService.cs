@@ -10,5 +10,6 @@ namespace Domain.Interfaces.Utilities
     {
         Task<string> UploadVideoAsync(Stream fileStream , string fileName);
         Task<bool> DeleteVideoAsync(string url);
+        string? GetStreamingUrl(string videoUrl, bool signUrl = false);
     }
 }

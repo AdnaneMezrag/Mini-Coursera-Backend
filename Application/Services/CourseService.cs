@@ -61,6 +61,16 @@ namespace Application.Services
         public async Task<List<CourseModuleReadDTO>> GetCourseModulesContentsAsync(int courseId)
         {
             List<CourseModule> courseModules = await _courseRepository.GetCourseModulesContentsAsync(courseId);
+            foreach (CourseModule courseModule in courseModules)
+            {
+                foreach (ModuleContent content in courseModule.ModuleContents)
+                {
+                    if (!string.IsNullOrEmpty(content.VideoUrl))
+                    {
+                        content.VideoUrl = _videoService.GetStreamingUrl(content.VideoUrl, signUrl: true);
+                    }
+                }
+            }
             List<CourseModuleReadDTO> courseModuleReadDTOs = _mapper.Map<List<CourseModuleReadDTO>>(courseModules);
             return courseModuleReadDTOs;
         }
@@ -83,6 +93,10 @@ namespace Application.Services
         public async Task<List<Course>> GetInstructorCoursesAsync(int instructorId)
         {
             return await _courseRepository.GetInstructorCoursesAsync(instructorId);
+        }
+        public async Task<int> GetEnrollmentsCountByCourseId(int courseId)
+        {
+            return await _courseRepository.GetEnrollmentsCountByCourseId(courseId);
         }
 
     }

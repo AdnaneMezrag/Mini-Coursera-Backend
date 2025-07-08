@@ -71,5 +71,35 @@ namespace Infrastructure.Utilities
             return true;
         }
 
+        public string? GetStreamingUrl(string videoUrl, bool signUrl = false)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(videoUrl)) return null;
+
+                string publicId = ExtractPublicIdFromUrl(videoUrl);
+
+                var transformation = new Transformation().StreamingProfile("full_hd");
+
+                var url = _cloudinary.Api.UrlVideoUp
+                    .Transform(transformation)
+                    .Secure(true)
+                    .Format("m3u8");
+
+                if (signUrl)
+                {
+                    url = url.Signed(true); // signs the URL
+                }
+
+                return url.BuildUrl(publicId);
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
+
+
     }
 }
