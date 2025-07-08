@@ -1,31 +1,30 @@
-# Build stage
+# Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy solution file
-COPY Backend/Backend.sln .
-
-# Copy only the .csproj files to match paths expected in .sln
-COPY Backend/API/API.csproj ./API.csproj
-COPY Application/Application.csproj ./Application.csproj
-COPY Domain/Domain.csproj ./Domain.csproj
-COPY Infrastructure/Infrastructure.csproj ./Infrastructure.csproj
+# Copy solution and all project files
+COPY Backend/Backend.sln ./Backend/
+COPY Backend/API.csproj ./Backend/
+COPY Application/Application.csproj ./Application/
+COPY Domain/Domain.csproj ./Domain/
+COPY Infrastructure/Infrastructure.csproj ./Infrastructure/
 
 # Restore dependencies
+WORKDIR /src/Backend
 RUN dotnet restore "Backend.sln"
 
-# Copy full project folders
-COPY Backend/API ./API
-COPY Application ./Application
-COPY Domain ./Domain
-COPY Infrastructure ./Infrastructure
+# Copy the full source code
+COPY Backend/ ./Backend/
+COPY Application/ ./Application/
+COPY Domain/ ./Domain/
+COPY Infrastructure/ ./Infrastructure/
 
 # Build and publish
-WORKDIR /src/API
+WORKDIR /src/Backend
 RUN dotnet build --no-restore -c Release
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet publish API.csproj --no-restore -c Release -o /app/publish
 
-# Runtime image
+# Runtime Image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
