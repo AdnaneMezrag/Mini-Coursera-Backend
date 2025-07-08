@@ -1,16 +1,20 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
+# Copy solution and project files
 COPY Backend/Backend.sln ./
-COPY Backend/Backend.csproj ./Backend/
-COPY Application/Application.csproj ./Application/
-COPY Domain/Domain.csproj ./Domain/
-COPY Infrastructure/Infrastructure.csproj ./Infrastructure/
+COPY Backend/Backend.csproj Backend/
+COPY Application/Application.csproj Application/
+COPY Domain/Domain.csproj Domain/
+COPY Infrastructure/Infrastructure.csproj Infrastructure/
 
-RUN dotnet restore
+# Restore dependencies
+RUN dotnet restore "Backend/Backend.sln"
 
+# Copy the full source code
 COPY . .
 
+# Build and publish
 WORKDIR /src/Backend
 RUN dotnet build --no-restore -c Release
 RUN dotnet publish -c Release -o /app/publish
