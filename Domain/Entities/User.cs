@@ -17,7 +17,7 @@ namespace Domain.Entities
         public string Email { get; set; } = default!;
         public string Password { get; set; } = default!;
         public string? PhotoUrl { get; set; }
-        public ICollection<Enrollment> Enrollments { get; set; }
+        public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public string FullName => $"{FirstName} {LastName}".Trim();
 
     }

@@ -1,4 +1,5 @@
-﻿using Application.Mapping;
+﻿using API.Utilities;
+using Application.Mapping;
 using Application.Services;
 using AutoMapper;
 using Domain.Entities;
@@ -8,8 +9,9 @@ using Infrastructure;
 using Infrastructure.Repositories;
 using Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 namespace Backend
 {
@@ -55,6 +57,11 @@ namespace Backend
             builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+
+            //Register JwtUtil
+            builder.Services.AddScoped<JwtUtil>();
+
+
             // AutoMapper
             builder.Services.AddSingleton<IMapper>(sp =>
             {
@@ -81,6 +88,37 @@ namespace Backend
                 });
             });
 
+            // ✅ Read the JWT Key explicitly for debugging
+            string jwtKey = builder.Configuration["JwtSettings:Key"];
+            if (string.IsNullOrWhiteSpace(jwtKey))
+            {
+                throw new Exception("❌ JWT Key is missing from configuration. Check appsettings.json or environment variables.");
+            }
+            Console.WriteLine($"✅ JWT Key loaded: {jwtKey.Substring(0, 5)}...");
+
+            // 🔐 Add Authentication + Authorization
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        //ClockSkew = TimeSpan.Zero, // 🔥 No delay allowed after expiration
+
+                        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtKey))
+                    };
+                });
+
+            builder.Services.AddAuthorization();
+
+
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -100,7 +138,12 @@ namespace Backend
                 app.UseCors("AllowFrontend");
             }
 
+
+
+
+
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();
             app.MapControllers();

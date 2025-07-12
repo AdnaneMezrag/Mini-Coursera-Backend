@@ -1,4 +1,5 @@
 ﻿using API.DTO;
+using API.Utilities;
 using Application.DTOs.Course;
 using Application.DTOs.User;
 using Application.Services;
@@ -16,10 +17,12 @@ namespace API.Controllers
     {
         IMapper _mapper;
         UserService _userService;
-        public UserController(IMapper mapper, UserService userService)
+        JwtUtil _jwtUtil;
+        public UserController(IMapper mapper, UserService userService, JwtUtil jwtUtil)
         {
             _mapper = mapper;
             _userService = userService;
+            _jwtUtil = jwtUtil;
         }
 
 
@@ -80,6 +83,9 @@ namespace API.Controllers
                 }
 
                 var userDTO = _mapper.Map<UserReadDTO>(user);
+                string role = (userDTO.UserType == Domain.Enums.UserTypeEnum.Student) ? "Student" : "Instructor";
+                string token = _jwtUtil.GenerateToken(userDTO.Id, role);
+                userDTO.Token = token;
                 return Ok(userDTO);
             }
             catch (Exception ex)

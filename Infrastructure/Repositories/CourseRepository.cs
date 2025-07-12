@@ -81,6 +81,7 @@ namespace Infrastructure.Repositories
         {
             return await _miniCourseraContext.Courses
                 .Where(course => course.InstructorID == instructorId)
+                .Include(course => course.CourseModules)
                 .ToListAsync();
         }
         public async Task<int> GetEnrollmentsCountByCourseId(int courseId)

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Enums;
+﻿using Domain.Enums;
 
 namespace Application.DTOs.User
 {
@@ -16,5 +11,6 @@ namespace Application.DTOs.User
         // Email should be unique 
         public string Email { get; set; } = default!;
         public string? PhotoUrl { get; set; }
+        public string? Token { get; set; }
     }
 }
