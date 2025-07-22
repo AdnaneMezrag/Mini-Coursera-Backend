@@ -14,8 +14,7 @@ namespace Application.DTOs.User
         public string? PhotoUrl { get; set; }
         public string? Token { get; set; }
 
-        // We can add this and store the RefreshToken in the HTTP only cookie isntead
-        //[JsonIgnore]
+        [JsonIgnore]
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiration { get; set; }
     }

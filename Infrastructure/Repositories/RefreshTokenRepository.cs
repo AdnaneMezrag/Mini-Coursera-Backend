@@ -40,9 +40,10 @@ namespace Infrastructure.Repositories
         {
             try
             {
-                return await _miniCourseraContext.RefreshTokens
-    .FirstOrDefaultAsync(rf => rf.UserId == userId && rf.ExpiresOn <= DateTime.UtcNow
+                RefreshToken? refreshToken = await _miniCourseraContext.RefreshTokens
+    .FirstOrDefaultAsync(rf => rf.UserId == userId && rf.ExpiresOn > DateTime.UtcNow
     && rf.RevokedOn == null);
+                return refreshToken;
             }
             catch (Exception ex) { 
                 return null;

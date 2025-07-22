@@ -3,9 +3,10 @@ using API.Utilities;
 using Application.DTOs.Course;
 using Application.DTOs.RefreshToken;
 using Application.DTOs.User;
+using Application.Exceptions;
 using Application.Services;
 using AutoMapper;
-using Application.Exceptions;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -79,11 +80,13 @@ namespace API.Controllers
                 {
                     return NotFound("No available user");
                 }
-
-                //var userDTO = _mapper.Map<UserReadDTO>(user);
-                //string role = (userDTO.UserType == Domain.Enums.UserTypeEnum.Student) ? "Student" : "Instructor";
-                //string token = _jwtUtil.GenerateToken(userDTO.Id, role);
-                //userDTO.Token = token;
+                HttpContext.Response.Cookies.Append("refreshToken", userDTO.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // only over HTTPS
+                    SameSite = SameSiteMode.Strict, // or Lax
+                    Expires = userDTO.RefreshTokenExpiration
+                });
                 return Ok(userDTO);
             }
             catch (Exception ex)
@@ -103,6 +106,12 @@ namespace API.Controllers
             try
             {
                 UserReadDTO? userReadDTO = await _userService.RefreshTokens(refreshTokenRequestDTO);
+                HttpContext.Response.Cookies.Append("refreshToken", userReadDTO.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // only over HTTPS
+                    Expires = userReadDTO.RefreshTokenExpiration
+                });
                 return Ok(userReadDTO);
             }
             catch (BadRequestException ex)
