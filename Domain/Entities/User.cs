@@ -19,6 +19,7 @@ namespace Domain.Entities
         public string? PhotoUrl { get; set; }
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
         public string FullName => $"{FirstName} {LastName}".Trim();
+        public ICollection<RefreshToken>? RefreshTokens { get; set; }
 
     }
 }

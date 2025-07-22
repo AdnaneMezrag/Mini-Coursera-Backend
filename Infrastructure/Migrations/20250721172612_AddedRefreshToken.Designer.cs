@@ -4,6 +4,7 @@ using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(MiniCourseraContext))]
-    partial class MiniCourseraContextModelSnapshot : ModelSnapshot
+    [Migration("20250721172612_AddedRefreshToken")]
+    partial class AddedRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -395,14 +398,20 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("UserId1")
                         .HasColumnType("int");
 
                     b.HasKey("TokenId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("Domain.Entities.Subject", b =>
@@ -626,9 +635,7 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.User", null)
                         .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("Domain.Entities.Course", b =>

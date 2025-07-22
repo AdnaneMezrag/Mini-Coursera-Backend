@@ -1,4 +1,5 @@
 ﻿using API.Utilities;
+using Application.Configurations;
 using Application.Mapping;
 using Application.Services;
 using AutoMapper;
@@ -6,6 +7,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Interfaces.Utilities;
 using Infrastructure;
+using Infrastructure.Configurations;
 using Infrastructure.Repositories;
 using Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -53,13 +55,20 @@ namespace Backend
             builder.Services.AddScoped<ModuleContentService>();
             builder.Services.AddScoped<IModuleContentRepository, ModuleContentRepository>();
 
+            //RefreshToken
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+
             // UnitOfWork
             builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            //Register TokenService
+            builder.Services.AddScoped<TokenService>();
 
-            //Register JwtUtil
-            builder.Services.AddScoped<JwtUtil>();
+
+            // Bind and register JwtSettings
+            builder.Services
+                .Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 
             // AutoMapper
@@ -106,7 +115,7 @@ namespace Backend
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        //ClockSkew = TimeSpan.Zero, // 🔥 No delay allowed after expiration
+                        ClockSkew = TimeSpan.Zero, // 🔥 No delay allowed after expiration
 
                         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                         ValidAudience = builder.Configuration["JwtSettings:Audience"],

@@ -1,11 +1,11 @@
 ﻿using API.DTO;
 using API.Utilities;
 using Application.DTOs.Course;
+using Application.DTOs.RefreshToken;
 using Application.DTOs.User;
 using Application.Services;
 using AutoMapper;
-using Azure.Core;
-using Microsoft.AspNetCore.Http;
+using Application.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -17,12 +17,12 @@ namespace API.Controllers
     {
         IMapper _mapper;
         UserService _userService;
-        JwtUtil _jwtUtil;
-        public UserController(IMapper mapper, UserService userService, JwtUtil jwtUtil)
+        //JwtUtil _jwtUtil;
+        public UserController(IMapper mapper, UserService userService)
         {
             _mapper = mapper;
             _userService = userService;
-            _jwtUtil = jwtUtil;
+            //_jwtUtil = jwtUtil;
         }
 
 
@@ -66,26 +66,24 @@ namespace API.Controllers
 
 
 
-
-        [HttpGet("login")]
+        [HttpPost("login")]
         [ProducesResponseType(typeof(UserReadDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserReadDTO>> GetUserByEmailAndPassword(
-    string email,string password)
+        public async Task<ActionResult<UserReadDTO>> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             try
             {
-                var user = await _userService.GetByEmailAndPasswordAsync(email,password);
-                if (user == null)
+                var userDTO = await _userService.GetByEmailAndPasswordAsync(loginRequestDTO.Email, loginRequestDTO.Password);
+                if (userDTO == null)
                 {
                     return NotFound("No available user");
                 }
 
-                var userDTO = _mapper.Map<UserReadDTO>(user);
-                string role = (userDTO.UserType == Domain.Enums.UserTypeEnum.Student) ? "Student" : "Instructor";
-                string token = _jwtUtil.GenerateToken(userDTO.Id, role);
-                userDTO.Token = token;
+                //var userDTO = _mapper.Map<UserReadDTO>(user);
+                //string role = (userDTO.UserType == Domain.Enums.UserTypeEnum.Student) ? "Student" : "Instructor";
+                //string token = _jwtUtil.GenerateToken(userDTO.Id, role);
+                //userDTO.Token = token;
                 return Ok(userDTO);
             }
             catch (Exception ex)
@@ -95,6 +93,27 @@ namespace API.Controllers
         }
 
 
+
+        [HttpPost("refreshToken")]
+        [ProducesResponseType(typeof(UserReadDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO refreshTokenRequestDTO)
+        {
+            try
+            {
+                UserReadDTO? userReadDTO = await _userService.RefreshTokens(refreshTokenRequestDTO);
+                return Ok(userReadDTO);
+            }
+            catch (BadRequestException ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error adding course module: {ex.Message}");
+            }
+        }
 
     }
 }

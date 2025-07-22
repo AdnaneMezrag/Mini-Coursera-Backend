@@ -1,4 +1,5 @@
 ﻿using Domain.Enums;
+using System.Text.Json.Serialization;
 
 namespace Application.DTOs.User
 {
@@ -12,5 +13,11 @@ namespace Application.DTOs.User
         public string Email { get; set; } = default!;
         public string? PhotoUrl { get; set; }
         public string? Token { get; set; }
+
+        // We can add this and store the RefreshToken in the HTTP only cookie isntead
+        //[JsonIgnore]
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExpiration { get; set; }
     }
+
 }

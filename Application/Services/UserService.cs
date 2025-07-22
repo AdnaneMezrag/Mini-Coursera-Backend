@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.DTOs.RefreshToken;
 using Application.DTOs.User;
+using Application.Exceptions;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Interfaces.Utilities;
+using System.Security.Claims;
 
 namespace Application.Services
 {
@@ -16,12 +14,18 @@ namespace Application.Services
         public IUserRepository _userRepository;
         public IMapper _mapper;
         private readonly IImageStorageService _imageStorage;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly TokenService _tokenService;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IImageStorageService imageStorageService)
+        public UserService(IUserRepository userRepository, IMapper mapper,
+            IImageStorageService imageStorageService, 
+            IRefreshTokenRepository refreshTokenRepository,TokenService tokenService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _imageStorage = imageStorageService;
+            _refreshTokenRepository = refreshTokenRepository;
+            _tokenService = tokenService;
         }
 
         public async Task CreateUserAsync(UserCreateDTO userCreateDTO, Stream imageStream)
@@ -34,11 +38,61 @@ namespace Application.Services
             await _userRepository.AddAsync(user);
         }
 
-        public async Task<User> GetByEmailAndPasswordAsync(string email, string password)
+        public async Task<UserReadDTO?> GetByEmailAndPasswordAsync(string email, string password)
         {
-            var user = await _userRepository.GetByEmailAndPasswordAsync(email, password);
-            //UserCreateDTO userCreateDTO = _mapper.Map<UserCreateDTO>(user);
-            return user;
+            User? user = await _userRepository.GetByEmailAndPasswordAsync(email, password);
+            if (user == null) return null;
+            UserReadDTO userDTO = _mapper.Map<UserReadDTO>(user);
+
+            //Add the Access Token
+            string token = _tokenService.GenerateAccessToken(user);
+            userDTO.Token = token;
+
+            RefreshToken? activeRefreshToken = await _refreshTokenRepository
+                .GetActiveRefreshToken(user.Id);
+            if (activeRefreshToken == null)
+            {
+                RefreshToken newRefreshToken = _tokenService.GenerateRefreshToken(user.Id);
+                userDTO.RefreshToken = newRefreshToken.Token;
+                userDTO.RefreshTokenExpiration = newRefreshToken.ExpiresOn;
+                await _refreshTokenRepository.AddAsync(newRefreshToken);
+            }
+            else
+            {
+                userDTO.RefreshToken = activeRefreshToken.Token;
+                userDTO.RefreshTokenExpiration = activeRefreshToken.ExpiresOn;
+            }
+
+            return userDTO;
         }
+
+        public async Task<UserReadDTO?> RefreshTokens(RefreshTokenRequestDTO refreshTokenRequestDTO)
+        {
+            string refreshToken = refreshTokenRequestDTO.RefreshToken;
+            int userId = refreshTokenRequestDTO.UserId;
+
+            RefreshToken? currentRefreshToken = await _refreshTokenRepository.GetRefreshTokenByTokenAndUserId(userId,refreshToken); 
+            if(currentRefreshToken == null || !currentRefreshToken.IsActive)
+            {
+                throw new BadRequestException("Invalid refresh token");
+            }
+            User user = currentRefreshToken.User;
+            UserReadDTO userDTO = _mapper.Map<UserReadDTO>(user);
+
+            // Generate new access token
+            userDTO.Token = _tokenService.GenerateAccessToken(user);
+
+            //Revoke the old refresh token
+            currentRefreshToken.RevokedOn = DateTime.UtcNow;
+            await _refreshTokenRepository.UpdateAsync(currentRefreshToken);
+
+            // Generate new refresh token
+            RefreshToken newRefreshToken = _tokenService.GenerateRefreshToken(user.Id);
+            userDTO.RefreshToken = newRefreshToken.Token;
+            userDTO.RefreshTokenExpiration = newRefreshToken.ExpiresOn;
+            await _refreshTokenRepository.AddAsync(newRefreshToken);
+            return userDTO;
+        }
+
     }
 }
