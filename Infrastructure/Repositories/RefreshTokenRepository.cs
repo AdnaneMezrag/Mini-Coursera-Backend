@@ -57,6 +57,13 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(rf => rf.Token == refreshToken
                 && rf.UserId == userId);
         }
+        public async Task<RefreshToken?> GetRefreshTokenByToken(string refreshToken)
+        {
+            return await _miniCourseraContext.RefreshTokens
+                .Include(rf => rf.User)
+                .FirstOrDefaultAsync(rf => rf.Token == refreshToken);
+        }
+
 
         public Task DeleteAsync(int id)
         {

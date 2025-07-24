@@ -9,7 +9,6 @@ namespace Application.DTOs.Enrollment
 {
     public class EnrollmentCreateDTO
     {
-        public int StudentId { get; set; } = default!;
         public int CourseId { get; set; } = default!;
     }
 }

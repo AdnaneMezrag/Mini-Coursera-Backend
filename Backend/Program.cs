@@ -93,7 +93,17 @@ namespace Backend
                 {
                     policy.WithOrigins("https://mini-coursera-frontend.vercel.app")
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // Add this if using cookies/auth
+                });
+
+                // Add a separate policy for development
+                options.AddPolicy("DevelopmentCors", policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173") // Your dev frontend
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials(); // Add this if using cookies/auth
                 });
             });
 
@@ -135,15 +145,12 @@ namespace Backend
                 app.UseSwagger();
                 app.UseSwaggerUI();
 
-                // Allow all in development
-                app.UseCors(policy =>
-                    policy.AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod());
+                // Use the development CORS policy
+                app.UseCors("DevelopmentCors");
             }
             else
             {
-                // ✅ Use named CORS policy in production
+                // Use production CORS policy
                 app.UseCors("AllowFrontend");
             }
 

@@ -21,9 +21,11 @@ namespace Application.Services
             _mapper = mapper;
         }
 
-        public async Task AddEnrollmentAsync(EnrollmentCreateDTO enrollmentCreateDTO)
+        public async Task AddEnrollmentAsync(int courseId,int studentId)
         {
-            var enrollment = _mapper.Map<Enrollment>(enrollmentCreateDTO);
+            Enrollment enrollment = new Enrollment();
+            enrollment.CourseId = courseId;
+            enrollment.StudentId = studentId;
             await _enrollmentRepository.AddAsync(enrollment);
         }
 
@@ -37,8 +39,8 @@ namespace Application.Services
 
         public async Task<EnrollmentReadDTO> GetEnrollmentByCourseIdAndStudentId(int courseId,int studentId)
         {
-            Enrollment enrollment = await _enrollmentRepository.GetEnrollmentByCourseIdAndStudentId(courseId,studentId);
-            EnrollmentReadDTO enrollmentRead = _mapper.Map<EnrollmentReadDTO>(enrollment);
+            Enrollment? enrollment = await _enrollmentRepository.GetEnrollmentByCourseIdAndStudentId(courseId,studentId);
+            EnrollmentReadDTO? enrollmentRead = _mapper.Map<EnrollmentReadDTO>(enrollment);
             return enrollmentRead;
         }
 

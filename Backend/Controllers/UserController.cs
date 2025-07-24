@@ -8,6 +8,7 @@ using Application.Services;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace API.Controllers
@@ -84,7 +85,7 @@ namespace API.Controllers
                 {
                     HttpOnly = true,
                     Secure = true, // only over HTTPS
-                    SameSite = SameSiteMode.Strict, // or Lax
+                    SameSite = SameSiteMode.None, // 👈 Required for cross-origin cookies
                     Expires = userDTO.RefreshTokenExpiration
                 });
                 return Ok(userDTO);
@@ -101,15 +102,18 @@ namespace API.Controllers
         [ProducesResponseType(typeof(UserReadDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDTO refreshTokenRequestDTO)
+        public async Task<IActionResult> RefreshToken()
         {
             try
             {
-                UserReadDTO? userReadDTO = await _userService.RefreshTokens(refreshTokenRequestDTO);
+                string? refreshToken = Request.Cookies["refreshToken"];
+                if (string.IsNullOrEmpty(refreshToken)) return BadRequest("Invalid request");
+                UserReadDTO? userReadDTO = await _userService.RefreshTokens(refreshToken);
                 HttpContext.Response.Cookies.Append("refreshToken", userReadDTO.RefreshToken, new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true, // only over HTTPS
+                    SameSite = SameSiteMode.None, // 👈 Required for cross-origin cookies
                     Expires = userReadDTO.RefreshTokenExpiration
                 });
                 return Ok(userReadDTO);
@@ -123,6 +127,7 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error adding course module: {ex.Message}");
             }
         }
+
 
     }
 }

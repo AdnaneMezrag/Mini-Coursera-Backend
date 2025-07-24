@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Course;
 using Application.DTOs.CourseModule;
 using Application.DTOs.Other;
+using Application.Exceptions;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -15,14 +16,17 @@ namespace Application.Services
         private readonly IImageStorageService _imageStorage;
         private readonly IMapper _mapper;
         private readonly IVideoService _videoService;
+        private readonly IEnrollmentRepository _enrollmentRepository;
 
         public CourseService(ICourseRepository courseRepository,
-            IImageStorageService imageStorage, IMapper mapper, IVideoService videoService)
+            IImageStorageService imageStorage, IMapper mapper, 
+            IVideoService videoService, IEnrollmentRepository enrollmentRepository)
         {
             _courseRepository = courseRepository;
             _imageStorage = imageStorage;
             _mapper = mapper;
             _videoService = videoService;
+            _enrollmentRepository = enrollmentRepository;
         }
 
         public async Task<List<Course>> GetNewCoursesAsync(int amount = 4)
@@ -58,8 +62,20 @@ namespace Application.Services
         {
             return await _courseRepository.GetByIdAsync(id);
         }
-        public async Task<List<CourseModuleReadDTO>> GetCourseModulesContentsAsync(int courseId)
+        public async Task<List<CourseModuleReadDTO>> GetCourseModulesContentsAsync(int courseId,int userId,string role)
         {
+            if(role == "Student")
+            {
+                bool result = await _enrollmentRepository
+                    .IsStudentEnrolledInCourse(userId, courseId);
+                if (!result) throw new ForbiddenException($"As a student you must be 1st enrolled in the course with Id = {courseId} to view its content");
+            }
+            else
+            {
+                bool result = await _courseRepository
+                    .IsCourseCreatedByInstructor(userId, courseId);
+                if (!result) throw new ForbiddenException($"As an instructor you don't have the course with Id = {courseId}");
+            }
             List<CourseModule> courseModules = await _courseRepository.GetCourseModulesContentsAsync(courseId);
             foreach (CourseModule courseModule in courseModules)
             {
@@ -74,19 +90,23 @@ namespace Application.Services
             List<CourseModuleReadDTO> courseModuleReadDTOs = _mapper.Map<List<CourseModuleReadDTO>>(courseModules);
             return courseModuleReadDTOs;
         }
-        public async Task UpdateCourseAsync(int Id, CourseCreateDTO courseCreateDTO, Stream? imageStream)
+        public async Task UpdateCourseAsync(int instructorId, int courseId,
+            CourseCreateDTO courseCreateDTO, Stream? imageStream)
         {
-            Course oldCourse = await _courseRepository.GetByIdAsync(Id);
+            Course? oldCourse = await _courseRepository.GetByIdAsync(courseId);
             if (oldCourse == null) {
-                throw new Exception("Course not found");
+                throw new NotFoundException("Course not found");
             }
+            bool isCourseCreatedByInstructor = await _courseRepository.IsCourseCreatedByInstructor(instructorId, courseId);
+            if (!isCourseCreatedByInstructor) throw new ForbiddenException("You can't update this course because it's not yours");
+            
             string imageUrl = oldCourse.ImageUrl;
             if (imageStream != null) {
                 await _imageStorage.DeleteImageAsync(oldCourse.ImageUrl);
                 imageUrl = await _imageStorage.SaveImageAsync(imageStream);
             }
             Course updatedCourse = _mapper.Map<Course>(courseCreateDTO);
-            updatedCourse.Id = Id;
+            updatedCourse.Id = courseId;
             updatedCourse.ImageUrl = imageUrl;
             await _courseRepository.UpdateAsync(updatedCourse);
         }

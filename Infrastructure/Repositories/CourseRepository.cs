@@ -90,17 +90,6 @@ namespace Infrastructure.Repositories
                 .CountAsync(enrollment => enrollment.CourseId == courseId);
             return count;
         }
-
-
-
-        public Task<List<Course>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-        public Task DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
         public async Task<List<Course>> GetCoursesByFilterAsync(FilterCoursesModel filterCoursesModel)
         {
             var query = _miniCourseraContext.Courses.AsQueryable();
@@ -126,7 +115,6 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
-
         public async Task<List<CourseModule>> GetCourseModulesContentsAsync(int courseId)
         {
             try
@@ -144,6 +132,21 @@ namespace Infrastructure.Repositories
 
             }
 
+        }
+        public async Task<bool> IsCourseCreatedByInstructor(int instructorId, int courseId)
+        {
+            return await _miniCourseraContext.Courses
+                .AnyAsync(course => course.InstructorID == instructorId
+                && course.Id == courseId);
+        }
+
+        public Task<List<Course>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+        public Task DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
         }
 
 

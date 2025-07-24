@@ -66,13 +66,37 @@ namespace Application.Services
             return userDTO;
         }
 
-        public async Task<UserReadDTO?> RefreshTokens(RefreshTokenRequestDTO refreshTokenRequestDTO)
+        public async Task<UserReadDTO?> RefreshTokens(string refreshToken, int userId)
         {
-            string refreshToken = refreshTokenRequestDTO.RefreshToken;
-            int userId = refreshTokenRequestDTO.UserId;
 
             RefreshToken? currentRefreshToken = await _refreshTokenRepository.GetRefreshTokenByTokenAndUserId(userId,refreshToken); 
             if(currentRefreshToken == null || !currentRefreshToken.IsActive)
+            {
+                throw new BadRequestException("Invalid refresh token");
+            }
+            User user = currentRefreshToken.User;
+            UserReadDTO userDTO = _mapper.Map<UserReadDTO>(user);
+
+            // Generate new access token
+            userDTO.Token = _tokenService.GenerateAccessToken(user);
+
+            //Revoke the old refresh token
+            currentRefreshToken.RevokedOn = DateTime.UtcNow;
+            await _refreshTokenRepository.UpdateAsync(currentRefreshToken);
+
+            // Generate new refresh token
+            RefreshToken newRefreshToken = _tokenService.GenerateRefreshToken(user.Id);
+            userDTO.RefreshToken = newRefreshToken.Token;
+            userDTO.RefreshTokenExpiration = newRefreshToken.ExpiresOn;
+            await _refreshTokenRepository.AddAsync(newRefreshToken);
+            return userDTO;
+        }
+
+        public async Task<UserReadDTO?> RefreshTokens(string refreshToken)
+        {
+
+            RefreshToken? currentRefreshToken = await _refreshTokenRepository.GetRefreshTokenByToken(refreshToken);
+            if (currentRefreshToken == null || !currentRefreshToken.IsActive)
             {
                 throw new BadRequestException("Invalid refresh token");
             }

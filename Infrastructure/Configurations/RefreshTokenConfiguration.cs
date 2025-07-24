@@ -8,9 +8,9 @@ namespace Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<RefreshToken> builder)
         {
-            builder.ToTable("RefreshTokens"); // <-- Set plural table name here
+            builder.ToTable("RefreshTokens");
 
-            builder.HasKey(rt => rt.TokenId); 
+            builder.HasKey(rt => rt.TokenId);
 
             builder.Property(rt => rt.Token)
                    .IsRequired()
@@ -31,9 +31,12 @@ namespace Infrastructure.Configurations
             builder.Ignore(rt => rt.IsExpired); // computed
             builder.Ignore(rt => rt.IsActive);  // computed
 
-            // Optional: index for fast lookups
             builder.HasIndex(rt => rt.UserId);
+
+            // ✅ Unique index on Token
+            builder.HasIndex(rt => rt.Token).IsUnique();
         }
+
     }
 
 }

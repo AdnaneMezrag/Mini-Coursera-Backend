@@ -11,5 +11,7 @@ namespace Domain.Interfaces
     {
         Task<RefreshToken?> GetActiveRefreshToken(int userId);
         Task<RefreshToken?> GetRefreshTokenByTokenAndUserId(int userId,string refreshToken);
+        Task<RefreshToken?> GetRefreshTokenByToken(string refreshToken);
+
     }
 }

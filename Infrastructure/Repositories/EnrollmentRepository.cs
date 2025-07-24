@@ -76,6 +76,13 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(enrollment => enrollment.Id == EnrollmentId);
         }
 
+        public async Task<bool> IsStudentEnrolledInCourse(int studentId, int courseId)
+        {
+            return await _miniCourseraContext.Enrollments
+                .AnyAsync(enroll => enroll.CourseId == courseId
+                && enroll.StudentId == studentId);
+        }
+
         public Task UpdateAsync(Enrollment entity)
         {
             throw new NotImplementedException();

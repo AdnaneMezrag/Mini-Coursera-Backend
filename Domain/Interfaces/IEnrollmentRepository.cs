@@ -9,8 +9,9 @@ namespace Domain.Interfaces
 {
     public interface IEnrollmentRepository:IBaseRepository<Enrollment>
     {
-        public Task <List<Enrollment>> GetEnrolledCoursesByStudentId(int studentId);
-        public Task <Enrollment> GetEnrollmentByCourseIdAndStudentId(int courseId, int studentId);
-        public Task<Enrollment?> GetEnrollmentWithProgressAndCourse(int EnrollmentId);
+        Task <List<Enrollment>> GetEnrolledCoursesByStudentId(int studentId);
+        Task <Enrollment?> GetEnrollmentByCourseIdAndStudentId(int courseId, int studentId);
+        Task<Enrollment?> GetEnrollmentWithProgressAndCourse(int EnrollmentId);
+        Task <bool> IsStudentEnrolledInCourse(int studentId,int courseId);
     }
 }

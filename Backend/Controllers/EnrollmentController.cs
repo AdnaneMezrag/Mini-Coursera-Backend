@@ -1,9 +1,11 @@
-﻿using System.Runtime.CompilerServices;
-using Application.DTOs.Course;
+﻿using Application.DTOs.Course;
 using Application.DTOs.Enrollment;
 using Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Runtime.CompilerServices;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -18,19 +20,25 @@ namespace API.Controllers
         }
 
 
+
+        [Authorize (Roles = "Student")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddEnrollmentAsync([FromBody] EnrollmentCreateDTO enrollmentCreateDTO)
         {
-            if (enrollmentCreateDTO == null)
+            int studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (enrollmentCreateDTO == null || enrollmentCreateDTO?.CourseId == null
+                || enrollmentCreateDTO.CourseId <= 0)
             {
                 return BadRequest("Enrollment data is null.");
             }
             try
             {
-                await _enrollmentService.AddEnrollmentAsync(enrollmentCreateDTO);
+                await _enrollmentService.AddEnrollmentAsync(enrollmentCreateDTO.CourseId, studentId);
                 return Ok("Enrollment added successfully.");
             }
             catch (Exception ex)
@@ -42,13 +50,16 @@ namespace API.Controllers
 
 
 
-        [HttpGet("student/{studentId}")]
+        [Authorize(Roles = "Student")]
+        [HttpGet("studentEnrolledCourses")]
         [ProducesResponseType(typeof(List<EnrollmentReadDTO>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<List<EnrollmentReadDTO>>> GetEnrolledCoursesByStudentId(
-int studentId)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<List<EnrollmentReadDTO>>> GetEnrolledCoursesByStudentId()
         {
+            int studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             try
             {
                 var enrollmentReadDTOs = await _enrollmentService.GetEnrolledCoursesByStudentId(studentId);
@@ -67,15 +78,20 @@ int studentId)
 
 
 
+
+        [Authorize(Roles = "Student")]
         [HttpGet("by-course-and-student")]
         [ProducesResponseType(typeof(List<EnrollmentReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EnrollmentReadDTO>> GetEnrollmentByCourseIdAndStudentId(
-     int courseId , int studentId)
+     int courseId)
         {
-            if(courseId <= 0 ||  studentId <= 0)
+            int studentId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (courseId <= 0 ||  studentId <= 0)
             {
                 return BadRequest("CourseId and/or StudentId should be > 0");
             }
