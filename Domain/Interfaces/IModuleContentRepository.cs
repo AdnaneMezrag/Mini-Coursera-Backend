@@ -9,6 +9,8 @@ namespace Domain.Interfaces
 {
     public interface IModuleContentRepository: IBaseRepository<ModuleContent>
     {
+        Task<bool> IsModuleContentCreatedByInstructor(int instructorId,
+            int moduleContentId);
     }
 
 }

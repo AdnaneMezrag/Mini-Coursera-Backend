@@ -63,7 +63,8 @@ namespace Infrastructure.Repositories
 
         public async Task<Enrollment?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _miniCourseraContext.Enrollments
+                .FirstOrDefaultAsync(enroll => enroll.Id == id);
         }
 
         public async Task<Enrollment?> GetEnrollmentWithProgressAndCourse(int EnrollmentId)

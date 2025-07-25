@@ -59,7 +59,15 @@ namespace Infrastructure.Repositories
             _miniCourseraContext.ModuleContents.Remove(moduleContent);
             await _miniCourseraContext.SaveChangesAsync();
         }
-
+        public async Task<bool> IsModuleContentCreatedByInstructor(int instructorId, 
+            int moduleContentId)
+        {
+            return await _miniCourseraContext.ModuleContents
+                .Include(moduleContent => moduleContent.courseModule)
+                    .ThenInclude(courseModule => courseModule.Course)
+                .AnyAsync(moduleContent => moduleContent.Id == moduleContentId
+                && moduleContent.courseModule.Course.InstructorID == instructorId);
+        }
 
 
         public Task<List<ModuleContent>> GetAllAsync()

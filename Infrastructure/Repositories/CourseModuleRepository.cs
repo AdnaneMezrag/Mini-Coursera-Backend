@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Domain.Entities;
+using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domain.Entities;
-using Domain.Interfaces;
 
 namespace Infrastructure.Repositories
 {
@@ -30,7 +31,13 @@ namespace Infrastructure.Repositories
                 await _miniCourseraContext.SaveChangesAsync();
             }
         }
-
+        public async Task<bool> IsCourseModuleCreatedByInstructor(int instructorId, int courseModuleId)
+        {
+            return await _miniCourseraContext.CourseModules
+                .Include(courseModule => courseModule.Course)
+                .AnyAsync(courseModule => courseModule.Id == courseModuleId
+                && courseModule.Course.InstructorID == instructorId);
+        }
         public Task<List<CourseModule>> GetAllAsync()
         {
             throw new NotImplementedException();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.DTOs.ModuleContent;
+using Application.Exceptions;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -14,19 +15,26 @@ namespace Application.Services
     public class ModuleContentService
     {
         private IModuleContentRepository _moduleContentRepository;
+        private ICourseModuleRepository _courseModuleRepository;
         private IMapper _mapper;
         private IVideoService _videoService;
         public ModuleContentService(
             IModuleContentRepository moduleContentRepository, IMapper mapper
-            ,IVideoService videoService)
+            ,IVideoService videoService, ICourseModuleRepository courseModuleRepository)
         {
             _moduleContentRepository = moduleContentRepository;
             _mapper = mapper;
             _videoService = videoService;
+            _courseModuleRepository = courseModuleRepository;
         }
 
-        public async Task<int> AddModuleContentAsync(ModuleContentCreateDTO moduleContentCreateDTO, Stream videoStream, string fileName)
+        public async Task<int> AddModuleContentAsync(int instructorId, 
+            ModuleContentCreateDTO moduleContentCreateDTO, Stream videoStream,
+            string fileName)
         {
+            bool result = await _courseModuleRepository
+                .IsCourseModuleCreatedByInstructor(instructorId, moduleContentCreateDTO.CourseModuleID);
+            if (!result) throw new BadRequestException($"Either you don't have the right to create this module content or the course module with id = {moduleContentCreateDTO.CourseModuleID} dosen't exist");
             ModuleContent moduleContent = _mapper.Map<ModuleContent>(moduleContentCreateDTO);
             if (moduleContent == null)
             {
@@ -41,8 +49,12 @@ namespace Application.Services
             return moduleContent.Id;
         }
 
-        public async Task UpdateModuleContentAsync(ModuleContentUpdateDTO dto, Stream? videoStream, string? fileName)
+        public async Task UpdateModuleContentAsync(int instructorId,
+            ModuleContentUpdateDTO dto, Stream? videoStream, string? fileName)
         {
+            bool result = await _moduleContentRepository.IsModuleContentCreatedByInstructor(
+                instructorId, dto.Id);
+            if (!result) throw new BadRequestException("Either the instructor dosen't have the right to update this module content or the module content itself dosen't exist");
             var moduleContent = _mapper.Map<ModuleContent>(dto);
             var original = await _moduleContentRepository.GetByIdAsync(moduleContent.Id);
             if (original == null) return;
@@ -61,13 +73,17 @@ namespace Application.Services
              await _moduleContentRepository.UpdateAsync(moduleContent);
         }
 
-        public async Task DeleteModuleContentAsync(int id)
+        public async Task DeleteModuleContentAsync(int instructorId, int id)
         {
             var moduleContent = await _moduleContentRepository.GetByIdAsync(id);
             if (moduleContent == null)
             {
-                throw new KeyNotFoundException($"Module content with ID {id} not found.");
+                throw new NotFoundException($"Module content with ID {id} not found.");
             }
+            bool result = await _moduleContentRepository.IsModuleContentCreatedByInstructor(
+    instructorId, id);
+            if (!result) throw new ForbiddenException("The instructor dosen't have the right to delete this module content");
+
 
             // Optional: delete the associated video from cloud storage if it exists
             if (!string.IsNullOrEmpty(moduleContent.VideoUrl))
